@@ -10,12 +10,16 @@
 #define BMP_CS   (10)
 
 Adafruit_BMP280 bmp; // I2C
-
-// Create an instance of the DHT11 class.
-// - For Arduino: Connect the sensor to Digital I/O Pin 2.
-// - For ESP32: Connect the sensor to pin GPIO2 or P2. CANT BOOT WHILE PLUGGED INTO 2
-// USE PIN 17 INSTEAD
 DHT11 dht11(17);
+
+unsigned long previousMillis = 0;
+unsigned long interval = 1000; // 1 second interval for reading sensors
+unsigned long errorCalculationInterval = 60000; // 1 minute for calculating average error
+unsigned long lastErrorCalculationTime = 0;
+int cookie = 0;
+
+float totalTemperatureError = 0.0;
+int errorCount = 0;
 
 void setup() {
     Serial.begin(9600);
@@ -26,7 +30,7 @@ void setup() {
 
     // BMP280 SETUP
     while ( !Serial ) delay(100);   // wait for native usb
-    Serial.println(F("BMP280 test"));
+    Serial.println(F("BMP280 test and DHT11 Sensor Readings"));
     unsigned status;
     status = bmp.begin(BMP280_ADDRESS_ALT, BMP280_CHIPID);
     // status = bmp.begin();
@@ -50,41 +54,59 @@ void setup() {
 }
 
 void loop() {
-    int temperature = 0;
-    int humidity = 0;
+    unsigned long currentMillis = millis();
 
-    // Attempt to read the temperature and humidity values from the DHT11 sensor.
-    int result = dht11.readTemperatureHumidity(temperature, humidity);
+    // Read sensors every 1 second
+    if (currentMillis - previousMillis >= interval) {
+        previousMillis = currentMillis;
 
-    // Check the results of the readings.
-    // If the reading is successful, print the temperature and humidity values.
-    // If there are errors, print the appropriate error messages.
-    if (result == 0) {
-        Serial.print("DHT-11\t");
-        Serial.print("Temperature: ");
-        Serial.print(temperature);
+        int temperatureDHT11 = 0;
+        int humidity = 0;
+
+        int result = dht11.readTemperatureHumidity(temperatureDHT11, humidity);
+
+        if (result == 0) {
+            Serial.print("DHT-11\t");
+            Serial.print("Temperature: ");
+            Serial.print(temperatureDHT11);
+            Serial.println("°C");
+        } else {
+            Serial.println(DHT11::getErrorString(result));
+        }
+
+        Serial.print("BMP280\t");
+        Serial.print(F("Temperature: "));
+        float temperatureBMP = bmp.readTemperature();
+        Serial.print(temperatureBMP);
         Serial.println("°C");
-        // Serial.print("\tHumidity: ");
-        // Serial.print(humidity);
-        // Serial.println(" %");
-    } else {
-        // Print error message based on the error code.
-        Serial.println(DHT11::getErrorString(result));
+
+        // Calculate temperature difference
+        float temperatureDifference = temperatureDHT11 - temperatureBMP;
+        // Serial.print("Temperature Difference: ");
+        // Serial.print(temperatureDifference);
+        // Serial.println("°C");
+
+        // cookie++;  // Counter to make sure correct number of samples was being averaged
+        // Serial.print("Counter: ");
+        // Serial.println(cookie);
+        
+        // Calculate average temperature error every 1 minute
+        if (currentMillis - lastErrorCalculationTime >= errorCalculationInterval) {
+            lastErrorCalculationTime = currentMillis;
+
+            // Update total temperature error and error count
+            totalTemperatureError += abs(temperatureDifference);
+            errorCount++;
+
+            // Calculate and print average temperature error
+            if (errorCount > 0) {
+                float averageError = totalTemperatureError / errorCount;
+                Serial.print("Average Temperature Error: ");
+                Serial.print(averageError);
+                Serial.println("°C");
+            }
+        }
+
+        Serial.println();
     }
-
-    Serial.print("BMP280\t");
-    Serial.print(F("Temperature: "));
-    Serial.print(bmp.readTemperature());
-    Serial.println("°C");
-
-    // Serial.print(F("Pressure = "));
-    // Serial.print(bmp.readPressure());
-    // Serial.println(" Pa");
-
-    // Serial.print(F("Approx altitude = "));
-    // Serial.print(bmp.readAltitude(1013.25)); /* Adjusted to local forecast! */
-    // Serial.println(" m");
-
-    Serial.println();
-    // delay(1000);
 }
