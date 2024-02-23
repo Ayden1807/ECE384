@@ -1,6 +1,6 @@
  #define output_encoderCLK 18
  #define output_encoderDATA 19
- #define output_encoderSW 5
+ #define output_encoderSW 13
 
  int counter = 0; 
  int aState;
