@@ -16,7 +16,6 @@ int encoderPos = 0;
 int counter = 0;
 int aState;
 int aLastState;  
-int SW_state;
 
 // BUTTON???
 int buttonState = 0;
