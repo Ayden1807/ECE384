@@ -8,18 +8,15 @@
 #define DHTPIN 17
 #define BUTTON_PIN 13
 
-// interrupt
-volatile int desiredMode = -1;
-
 // modeSelect
 int encoderPos = 0;
-int counter = 0;
 int aState;
-int aLastState;  
+int aLastState;
+int counter = 0;
+int displayStartTime = 0;
 
-// BUTTON???
-int buttonState = 0;
-int lastButtonState = 0;
+// BUTTON
+volatile bool buttonPressed = false;
 
 // from the old code
 DHT11 dht(DHTPIN);
@@ -31,13 +28,9 @@ struct Button {
   bool pressed;
 };
 
-Button button1 = {BUTTON_PIN, 0, false};  // Change the PIN to BUTTON_PIN
-unsigned long displayStartTime = 0;
+Button button1 = {BUTTON_PIN, 0};
 
-void IRAM_ATTR isr() {
-  button1.numberKeyPresses += 1;
-  button1.pressed = true;
-}
+volatile int desiredMode = -1; // Initialize to an invalid mode
 
 // Define different modes
 enum Mode {
@@ -50,6 +43,34 @@ enum Mode {
 };
 
 Mode currentMode = REGULAR;
+
+void IRAM_ATTR isr() {
+  button1.numberKeyPresses += 1;
+  buttonPressed = true;
+
+  // Set the desired mode based on the encoder position
+  switch (encoderPos) {
+    case 0:
+      desiredMode = REGULAR;
+      break;
+    case 1:
+      desiredMode = DEBUG;
+      break;
+    case 2:
+      desiredMode = CONSTANT_DISPLAY;
+      break;
+    case 3:
+      desiredMode = POWER_SAVE;
+      break;
+    case 4:
+      desiredMode = ON_REQUEST_SAVE_DATA;
+      break;
+    case 5:
+      desiredMode = HIBERNATE_STANDBY;
+      break;
+    // Add more cases as needed
+  }
+}
 
 void setup() {
   pinMode(encoderCLK, INPUT);
@@ -85,82 +106,54 @@ void setup() {
   lcd.clear();
   lcd.print("PRESS BUTTON!");
 
-  pinMode(button1.PIN, INPUT_PULLUP);
-  attachInterrupt(button1.PIN, isr, FALLING);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), isr, FALLING);
 
   aLastState = digitalRead(encoderCLK);
 }
 
-void modeSelect();
-void REGULAR_MODE();
+
 
 void loop() {
-    modeSelect();
+  modeSelect();
 
-    // Switch modes based on encoder position
-    switch (encoderPos) {
-        case 0:
-            currentMode = REGULAR;
-            break;
-        case 1:
-            currentMode = DEBUG;
-            break;
-        case 2:
-            currentMode = CONSTANT_DISPLAY;
-            break;
-        case 3:
-            currentMode = POWER_SAVE;
-            break;
-        case 4:
-            currentMode = ON_REQUEST_SAVE_DATA;
-            break;
-        case 5:
-            currentMode = HIBERNATE_STANDBY;
-            break;
-        // Add more cases as needed
+  if (desiredMode != -1) {
+    // Switch to the desired mode
+    currentMode = static_cast<Mode>(desiredMode);
+    desiredMode = -1; // Reset the desired mode
+    lcd.clear();
+  }
 
-        // Wrap-around for continuous mode switching
-        default:
-            encoderPos = 0;
-            break;
-    }
-
-    // Perform actions based on the current mode
-    switch (currentMode) {
-        case REGULAR:
-            lcd.clear();
-            lcd.print("Regular Mode");
-            REGULAR_MODE();
-            break;
-        case DEBUG:
-            lcd.clear();
-            lcd.print("Debug Mode");
-            // Debug mode actions
-            break;
-        case CONSTANT_DISPLAY:
-            lcd.clear();
-            lcd.print("Constant Display Mode");
-            // Constant display mode actions
-            break;
-        case POWER_SAVE:
-            lcd.clear();
-            lcd.print("Power Save Mode");
-            // Power save mode actions
-            break;
-        case ON_REQUEST_SAVE_DATA:
-            lcd.clear();
-            lcd.print("On Request Mode");
-            // On request save data mode actions
-            break;
-        case HIBERNATE_STANDBY:
-            lcd.clear();
-            lcd.print("Hibernate/Standby Mode");
-            // Hibernate/standby mode actions
-            break;
-        // Add more cases as needed
-    }
-
-    // Add delay if necessary to avoid rapid menu changes
-    delay(100);
+  // Switch modes based on encoder position
+  switch (currentMode) {
+    case REGULAR:
+      lcd.println("Regular Mode");
+      // Call your regular mode function here
+      break;
+    case DEBUG:
+      lcd.println("Debug Mode");
+      // Call your debug mode function here
+      break;
+    case CONSTANT_DISPLAY:
+      lcd.println("Constant Display Mode");
+      // Call your constant display mode function here
+      break;
+    case POWER_SAVE:
+      lcd.println("Power Save Mode");
+      // Call your power save mode function here
+      break;
+    case ON_REQUEST_SAVE_DATA:
+      lcd.println("On Request Mode");
+      // Call your on request save data mode function here
+      break;
+    case HIBERNATE_STANDBY:
+      lcd.println("Hibernate/Standby Mode");
+      // Call your hibernate/standby mode function here
+      break;
+    // Add more cases as needed
+  }
+  
+  // Add delay if necessary to avoid rapid menu changes
+delay(1000);
+lcd.clear();
 }
-
