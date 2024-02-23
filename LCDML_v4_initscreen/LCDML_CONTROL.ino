@@ -266,7 +266,7 @@ void LCDML_CONTROL_setup()
   {  
     pinMode(_LCDML_CONTROL_encoder_pin_a      , INPUT_PULLUP);
     pinMode(_LCDML_CONTROL_encoder_pin_b      , INPUT_PULLUP);
-    pinMode(_LCDML_CONTROL_encoder_pin_button , INPUT_PULLUP);
+    pinMode(_LCDML_CONTROL_encoder_pin_button , INPUT);
   } 
 }
 

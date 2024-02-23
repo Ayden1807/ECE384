@@ -75,74 +75,166 @@ void LCDML_DISP_loop_end(LCDML_FUNC_information)
 
 // *********************************************************************
 // NORMAL MODE
-uint8_t g_func_timer_info = 0;  // time counter (global variable)
-unsigned long g_timer_1 = 0;    // timer variable (globale variable)
+DHT11 dht11(DHTPIN);
+Adafruit_BMP280 bmp;
+unsigned long lastButtonTime = 0;
+unsigned long debounceDelay = 100;
 // *********************************************************************
 void LCDML_DISP_setup(LCDML_FUNC_normal_mode){
   // setup function   
-  lcd.print(F("x sec wait")); // print some content on first row  
-  g_func_timer_info = 10;       // reset and set timer    
-  LCDML_DISP_triggerMenu(100);  // starts a trigger event for the loop function every 100 millisecounds
+  bmp.begin(BMP280_ADDRESS_ALT,  BMP280_CHIPID);
+  lcd.setCursor(0, 0);
+  lcd.print(F("NORMAL MODE"));
+  lcd.setCursor(0, 1);
+  lcd.print(F("ACTIVATED"));
+  delay(5000);
+  lcd.setBacklight(0);
+
+  // starts a trigger event for the loop function every 1 secounds
+  LCDML_DISP_triggerMenu(1000);
 }
 
-void LCDML_DISP_loop(LCDML_FUNC_normal_mode)
-{ 
-  // loop function, can be run in a loop when LCDML_DISP_triggerMenu(xx) is set
-  // the quit button works in every DISP function without any checks; it starts the loop_end function 
+void LCDML_DISP_loop(LCDML_FUNC_normal_mode){ 
+  float DHT11_temp = dht11.readTemperature();
+  float humid = dht11.readHumidity();
+  float press = bmp.readPressure() / 100.0;   //convert Pa to hPa for space saving
+  float BMP280_temp = bmp.readTemperature();
+  int lightIntensity = analogRead(LIGHTPIN);
+
+unsigned long currentMillis = millis();
+
+  if(currentMillis - lastButtonTime >= debounceDelay){
+    if(LCDML_BUTTON_checkEnter()){
+      LCDML_BUTTON_resetEnter();
+      lcd.clear();
+      lcd.setBacklight(255);
+      Serial.println("BUTTON PRESSSED");
+      lcd.setCursor(0, 0);
+      lcd.print(DHT11_temp);
+      lcd.write(223);
+      lcd.print("C  ");
+      lcd.print(humid);
+      lcd.print("%");
+      lcd.setCursor(0, 1);
+      lcd.print(press);
+      lcd.print("hPa  ");
+      if(lightIntensity > 2800){
+        lcd.print("V.Dark");
+      } else if(lightIntensity > 1000){
+        lcd.print("Dark");
+      } else if(lightIntensity > 400){
+        lcd.print("Bright");
+      } else{
+        lcd.print("V.Bright");
+      }
+
+      delay(5000);
+      lcd.setBacklight(0);
+      lcd.clear();
+      lastButtonTime = currentMillis;
+    }
+
   
-  // this function is called every 100 millisecounds
-  
-  // this timer checks every 1000 millisecounds if it is called
-  if((millis() - g_timer_1) >= 1000) {
-    g_timer_1 = millis();   
-    g_func_timer_info--;                // increment the value every secound
-    lcd.setCursor(0, 0);                // set cursor pos
-    lcd.print(g_func_timer_info);       // print the time counter value
-  }
-  
-  // reset the initscreen timer
-  LCDML_DISP_resetIsTimer();
-  
-  // this function can only be ended when quit button is pressed or the time is over
-  // check if the function ends normaly
-  if (g_func_timer_info <= 0)
-  {
-    // end function for callback
-    LCDML_DISP_funcend();  
+
+  if (LCDML_BUTTON_checkUp() || LCDML_BUTTON_checkDown()) {
+    LCDML_BUTTON_resetLeft();
+    LCDML_BUTTON_resetRight();
+    LCDML_DISP_funcend();
   }   
+  }
 }
 
-void LCDML_DISP_loop_end(LCDML_FUNC_normal_mode) 
-{
-  // this functions is ever called when a DISP function is quit
-  // you can here reset some global vars or do nothing
+void LCDML_DISP_loop_end(LCDML_FUNC_normal_mode) {
+  lcd.setBacklight(255);
 }
+
 
 //===================================================================== *
 // DEBUG_MODE
-// SET GLOBAL VARIABLES HERE
+// DHT11 dht11(DHTPIN);
+// Adafruit_BMP280 bmp;
+// unsigned long lastButtonTime = 0;
+// unsigned long debounceDelay = 100;
 //===================================================================== *
 void LCDML_DISP_setup(LCDML_FUNC_debug_mode) {
   // setup
-  // is called only if it is started
+  bmp.begin(BMP280_ADDRESS_ALT,  BMP280_CHIPID);
+  lcd.setCursor(0, 0);
+  lcd.print(F("DEBUG MODE"));
+  lcd.setCursor(0, 1);
+  lcd.print(F("ACTIVATED"));
+
 
   // starts a trigger event for the loop function every 1 secounds
   LCDML_DISP_triggerMenu(1000);
 }
 
 void LCDML_DISP_loop(LCDML_FUNC_debug_mode) {
+  float DHT11_temp = dht11.readTemperature();
+  float humid = dht11.readHumidity();
+  float press = bmp.readPressure() / 100.0;   //convert Pa to hPa for space saving
+  float BMP280_temp = bmp.readTemperature();
+  int lightIntensity = analogRead(LIGHTPIN);
+
+  Serial.print("DHT11 Temp: ");
+  Serial.print(DHT11_temp);
+  Serial.print("C\t DHT11 Humid: ");
+  Serial.print(humid);
+  Serial.print("%\t BMP280 Pressure: ");
+  Serial.print(press);
+  Serial.print("Pa\t BMP280 Temp: ");
+  Serial.print(BMP280_temp);
+  Serial.print("C\t Light Intensity: ");
+  Serial.println(lightIntensity);
+  
   // loop
   // is called when it is triggert
   // - with LCDML_DISP_triggerMenu( millisecounds )
   // - with every button status change
 
-  // check if any button is presed (enter, up, down, left, right)
-  if (LCDML_BUTTON_quit()) {
+  unsigned long currentMillis = millis();
+
+  if(currentMillis - lastButtonTime >= debounceDelay){
+    if(LCDML_BUTTON_checkEnter()){
+      LCDML_BUTTON_resetEnter();
+      lcd.clear();
+      lcd.setBacklight(255);
+      Serial.println("BUTTON PRESSSED");
+      lcd.setCursor(0, 0);
+      lcd.print(DHT11_temp);
+      lcd.write(223);
+      lcd.print("C  ");
+      lcd.print(humid);
+      lcd.print("%");
+      lcd.setCursor(0, 1);
+      lcd.print(press);
+      lcd.print("hPa  ");
+      if(lightIntensity > 2800){
+        lcd.print("V.Dark");
+      } else if(lightIntensity > 1000){
+        lcd.print("Dark");
+      } else if(lightIntensity > 400){
+        lcd.print("Bright");
+      } else{
+        lcd.print("V.Bright");
+      }
+
+      delay(5000);
+      lcd.setBacklight(0);
+      lcd.clear();
+      lastButtonTime = currentMillis;
+    }
+  }
+  // check if any button is presed (up or down)
+  if (LCDML_BUTTON_checkUp() || LCDML_BUTTON_checkDown()) {
+    LCDML_BUTTON_resetLeft();
+    LCDML_BUTTON_resetRight();
     LCDML_DISP_funcend();
   }
 }
 
 void LCDML_DISP_loop_end(LCDML_FUNC_debug_mode) {
+  lcd.setBacklight(255);
   // this functions is ever called when a DISP function is quit
   // you can here reset some global vars or do nothing
 }

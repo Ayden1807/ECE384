@@ -18,8 +18,15 @@
   #include <LiquidCrystal_PCF8574.h>
   #include <LCDMenuLib.h>
   #include <DHT11.h>
-  #include <
+  #include <Adafruit_Sensor.h>
+  #include <Adafruit_BMP280.h>
   
+  // *******************************************************************
+  // MY PINS
+  #define DHTPIN 17
+  #define LIGHTPIN 4
+  // *******************************************************************
+
   // lib config
   #define _LCDML_DISP_cfg_button_press_time          200    // button press time in ms
   #define _LCDML_DISP_cfg_initscreen_time            10000  // enable initscreen time
@@ -51,7 +58,7 @@
   // create menu
   // menu element count - last element id
   // this value must be the same as the last menu element
-  #define _LCDML_DISP_cnt    12
+  #define _LCDML_DISP_cnt    10
   
   // LCDML_root        => layer 0 
   // LCDML_root_X      => layer 1 
@@ -64,16 +71,14 @@
   LCDML_DISP_add      (0  , _LCDML_G1  , LCDML_root        , 1  , "Information"        , LCDML_FUNC_information);
   LCDML_DISP_add      (1  , _LCDML_G1  , LCDML_root        , 2  , "Normal Mode"        , LCDML_FUNC_normal_mode);
   LCDML_DISP_add      (2  , _LCDML_G1  , LCDML_root        , 3  , "Debug Mode"         , LCDML_FUNC_debug_mode);
-  // LCDML_DISP_add      (3  , _LCDML_G1  , LCDML_root_3      , 1  , "Change value"       , LCDML_FUNC);
-  // LCDML_DISP_add      (4  , _LCDML_G1  , LCDML_root_3      , 2  , "Something"          , LCDML_FUNC);
-  LCDML_DISP_add      (5  , _LCDML_G1  , LCDML_root        , 4  , "Program"            , LCDML_FUNC);
-  LCDML_DISP_add      (6  , _LCDML_G1  , LCDML_root_4      , 1  , "Program 1"          , LCDML_FUNC);
-  LCDML_DISP_add      (7  , _LCDML_G1  , LCDML_root_4_1    , 1  , "P1 start"           , LCDML_FUNC);
-  LCDML_DISP_add      (8  , _LCDML_G1  , LCDML_root_4_1    , 2  , "Settings"           , LCDML_FUNC);
-  LCDML_DISP_add      (9  , _LCDML_G1  , LCDML_root_4_1_2  , 1  , "Warm"               , LCDML_FUNC);
-  LCDML_DISP_add      (10 , _LCDML_G1  , LCDML_root_4_1_2  , 2  , "Long"               , LCDML_FUNC);
-  LCDML_DISP_add      (11 , _LCDML_G1  , LCDML_root_4      , 2  , "Program 2"          , LCDML_FUNC_p2);
-  LCDML_DISP_add      (12 , _LCDML_G7  , LCDML_root        , 5  , "Program 2"          , LCDML_FUNC_initscreen); // in g7 => hidden
+  LCDML_DISP_add      (3  , _LCDML_G1  , LCDML_root        , 4  , "Program"            , LCDML_FUNC);
+  LCDML_DISP_add      (4  , _LCDML_G1  , LCDML_root_4      , 1  , "Program 1"          , LCDML_FUNC);
+  LCDML_DISP_add      (5  , _LCDML_G1  , LCDML_root_4_1    , 1  , "P1 start"           , LCDML_FUNC);
+  LCDML_DISP_add      (6  , _LCDML_G1  , LCDML_root_4_1    , 2  , "Settings"           , LCDML_FUNC);
+  LCDML_DISP_add      (7  , _LCDML_G1  , LCDML_root_4_1_2  , 1  , "Warm"               , LCDML_FUNC);
+  LCDML_DISP_add      (8 , _LCDML_G1  , LCDML_root_4_1_2  , 2  , "Long"               , LCDML_FUNC);
+  LCDML_DISP_add      (9 , _LCDML_G1  , LCDML_root_4      , 2  , "Program 2"          , LCDML_FUNC_p2);
+  LCDML_DISP_add      (10 , _LCDML_G7  , LCDML_root        , 5  , "Program 2"          , LCDML_FUNC_initscreen); // in g7 => hidden
   LCDML_DISP_createMenu(_LCDML_DISP_cnt);
 
 
@@ -98,7 +103,7 @@
     // serial init; only be needed if serial control is used    
     Serial.begin(9600);                // start serial    
     Serial.println(F(_LCDML_VERSION)); // only for examples
-    
+
     // LCD Begin
     lcd.begin(_LCDML_DISP_cols,_LCDML_DISP_rows);
     lcd.setBacklight(255);  
