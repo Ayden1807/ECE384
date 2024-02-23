@@ -14,6 +14,5 @@ void loop() {
 
   Serial.print("Light Value: ");
   Serial.println(PR_value);
-  delay(5000);
-  // delay(5000) = 5sec
+  delay(1000);
 }
