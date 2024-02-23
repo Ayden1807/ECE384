@@ -27,7 +27,7 @@
      } else {
        counter --;
      }
-     Serial.print("Position: ");
+    //Serial.print("Position:");
      Serial.println(counter);
    } 
    SW_state = digitalRead(output_encoderSW);
