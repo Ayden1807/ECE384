@@ -163,6 +163,8 @@ void LCDML_DISP_setup(LCDML_FUNC_debug_mode) {
   lcd.print(F("DEBUG MODE"));
   lcd.setCursor(0, 1);
   lcd.print(F("ACTIVATED"));
+  delay(5000);
+  lcd.setBacklight(0);
 
 
   // starts a trigger event for the loop function every 1 secounds
