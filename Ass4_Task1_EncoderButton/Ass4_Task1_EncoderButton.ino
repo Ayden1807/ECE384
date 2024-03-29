@@ -1,5 +1,5 @@
- #define output_encoderCLK 18
- #define output_encoderDATA 19
+ #define output_encoderCLK 2
+ #define output_encoderDATA 4
  #define output_encoderSW 13
 
  int counter = 0; 
@@ -32,7 +32,7 @@
    } 
    SW_state = digitalRead(output_encoderSW);
 
-   if (SW_state == LOW) {
+   if (SW_state == HIGH) {
     counter = 0;
     Serial.println("Counter Reset");
    }
