@@ -15,8 +15,11 @@
 // ============================================================  
 
   // include libs
-  #include <LiquidCrystal_PCF8574.h>
+  #include <WiFi.h>
+  #include <WebServer.h>
+  #include <SPIFFS.h>
   #include <LCDMenuLib.h>
+  #include <LiquidCrystal_PCF8574.h>
   #include <DHT11.h>
   #include <Adafruit_Sensor.h>
   #include <Adafruit_BMP280.h>
@@ -25,6 +28,15 @@
   // MY PINS
   #define DHTPIN 17
   #define LIGHTPIN 4
+  #define RST 0
+  // *******************************************************************
+  // Iot Information
+  const char *ssid = "ESP32-Access-Point";
+  const char *password = "123456789";
+
+  WebServer server(80);
+  const char *filename = "/wifi.txt";
+
   // *******************************************************************
 
   // lib config
@@ -43,6 +55,7 @@
   // lcd object
   // liquid crystal needs (rs, e, dat4, dat5, dat6, dat7)
   LiquidCrystal_PCF8574 lcd(0x27);
+  DHT11 dht(DHTPIN);
   
   const uint8_t scroll_bar[5][8] = {
     {B10001, B10001, B10001, B10001, B10001, B10001, B10001, B10001}, // scrollbar top
@@ -100,8 +113,12 @@
 // *********************************************************************
   void setup()
   {  
+    Serial.begin(115200);                // start serial   
+    
+    wifiSetup();
+
     // serial init; only be needed if serial control is used    
-    Serial.begin(9600);                // start serial    
+ 
     Serial.println(F(_LCDML_VERSION)); // only for examples
 
     // LCD Begin
@@ -138,9 +155,15 @@
     
     // this function must called here, do not delete it
     LCDML_run(_LCDML_priority); 
+    
+    server.handleClient();
+
+  if(digitalRead(RST) == LOW){
+    Serial.println("RST Button Pressed");
+    factoryReset();
+    delay(1000);
   }
-
-
+  }
 
 
 // *********************************************************************
