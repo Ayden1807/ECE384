@@ -15,10 +15,18 @@ void wifiSetup() {
   lcd.begin(_LCDML_DISP_cols, _LCDML_DISP_rows);
   lcd.clear();
   lcd.setBacklight(255);
-  lcd.setCursor(0, 0);
+  lcd.setCursor(0,0);
+  lcd.print("Access Point");
+  lcd.setCursor(0,1);
+  lcd.print("Mode");
+  delay(5000);
+  blinkOnboardLED(500,10);
+  lcd.clear();
+  lcd.setCursor(0,0);
   lcd.print("AP IP:");
   lcd.setCursor(0,1);
   lcd.print(WiFi.softAPIP());
+  delay(10000);
 
   // Setup server routes
   server.on("/", handleRoot);

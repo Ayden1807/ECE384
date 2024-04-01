@@ -92,6 +92,13 @@ void loadCredentials() {
   file.close();
 
   Serial.print("Connecting to stored WiFi network: ");
+  lcd.clear();
+  lcd.setBacklight(255);
+  lcd.setCursor(0,0);
+  lcd.print("Attempting");
+  lcd.setCursor(0,1);
+  lcd.print("Re-Connect");
+  delay(3000);
   Serial.println(ssid);
 
   // Connect to the stored WiFi network
@@ -104,24 +111,37 @@ void loadCredentials() {
   }
 
   if (WiFi.status() == WL_CONNECTED) {
+    turnOnOnboardLED();
     Serial.println("");
     Serial.println("WiFi connected");
     Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
   } else {
     Serial.println("");
-    Serial.println("Failed to connect to WiFi network. Restarting in Access Point mode.");
+    Serial.println("Failed to connect to WiFi network. Restarting in Access Point mode."); 
     factoryReset();
+    lcd.clear();
+    lcd.setBacklight(255);
+    lcd.setCursor(0,0);
+    lcd.print("WiFi Connection");
+    lcd.setCursor(0,1);
+    lcd.print("Failed");
+    delay(3000);
   }
 }
 
 void printIPAddress() {
+  lcd.clear();
+  lcd.setBacklight(255);
+  lcd.setCursor(0,0);
+  lcd.print("WiFi Connected");
+  delay(5000);
   lcd.clear(); // Clear LCD before printing
   lcd.setCursor(0, 0);
   lcd.print("IP:");
   lcd.setCursor(0,1);
   lcd.print(WiFi.localIP());
-  delay(5000);
+  delay(10000);
 }
 
 void factoryReset() {
@@ -135,8 +155,7 @@ void factoryReset() {
   }
 
   // Restart ESP32 in Access Point mode
-  WiFi.mode(WIFI_AP);
-  WiFi.softAP(ssid, password);
+  wifiSetup();
 
   Serial.println("Factory reset completed. ESP32 restarted in Access Point mode.");
 }
