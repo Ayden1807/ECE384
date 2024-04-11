@@ -225,8 +225,8 @@ void LCDML_CONTROL_loop()
 // *********************************************************************
 #elif(_LCDML_CONTROL_cfg == 3)
 // settings
-  #define _LCDML_CONTROL_encoder_pin_a                  18 // pin encoder b
-  #define _LCDML_CONTROL_encoder_pin_b                  19 // pin encoder a
+  #define _LCDML_CONTROL_encoder_pin_a                  2 // pin encoder b
+  #define _LCDML_CONTROL_encoder_pin_b                  4 // pin encoder a
   #define _LCDML_CONTROL_encoder_pin_button             13 // pin taster
   #define _LCDML_CONTROL_encoder_high_active            0 // (0 = low active (pullup), 1 = high active (pulldown)) button
                                                           // http://playground.arduino.cc/CommonTopics/PullUpDownResistor
