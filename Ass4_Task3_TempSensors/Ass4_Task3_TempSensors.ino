@@ -10,7 +10,7 @@
 #define BMP_CS   (10)
 
 Adafruit_BMP280 bmp; // I2C
-DHT11 dht11(17);
+DHT11 dht11(16);
 
 unsigned long previousMillis = 0;
 unsigned long interval = 1000; // 1 second interval for reading sensors
