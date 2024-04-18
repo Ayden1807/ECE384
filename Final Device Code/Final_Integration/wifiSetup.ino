@@ -20,7 +20,7 @@ void wifiSetup() {
   lcd.setCursor(0,1);
   lcd.print("Mode");
   delay(5000);
-  blinkOnboardLED(500,10);
+  // blinkOnboardLED(500,10);     //Make this blink until wifi is connected and don't use pin 2 for LED. Pin 2 needs to be connected to the encoder!!
   lcd.clear();
   lcd.setCursor(0,0);
   lcd.print("AP IP:");
@@ -36,17 +36,17 @@ void wifiSetup() {
   // Initialize SPIFFS
   // factoryReset();       //This is a debug feature
 
-  if (!SPIFFS.begin(true)) {
-    Serial.println("An error occurred while mounting SPIFFS");
-    return;
-  }
-
-  // Check if WiFi credentials file exists
-  if (SPIFFS.exists(filename)) {
-    Serial.println("Found existing WiFi credentials file");
-    loadCredentials();
+  File file = SPIFFS.open(filename, "r");
+  if (file) {
+      if (file.available()) {
+          Serial.println("Found existing WiFi credentials file with content");
+          loadCredentials();
+      } else {
+          Serial.println("Found existing WiFi credentials file, but it's empty");
+      }
+      file.close();
   } else {
-    Serial.println("No existing WiFi credentials file found");
+      Serial.println("No existing WiFi credentials file found");
   }
 
   server.begin();

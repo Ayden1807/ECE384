@@ -5,14 +5,9 @@
 // Last update: 08.01.2017
 // License:     MIT                                     
 // ============================================================ 
-// Descripton:     
-// This example shows you how the initscreen or standbyscreen 
-// works. The initscreen is a hidden menu element (example 004)
-// witch it is not displayed in menu. The initscreen is called 
-// when no action or trigger is set after ...cfg_initscreen_time
-// milliseconds. When a other menu function is active, this function
-// is stoped stable before initscreen function is started. 
-// ============================================================  
+
+  // DEBUG TURN ON/OFF
+  // #define DEBUG_WIFI
 
   // include libs
   #include <WiFi.h>
@@ -160,7 +155,7 @@
 
   if(digitalRead(RST) == LOW){
     Serial.println("RST Button Pressed");
-    factoryReset();
+    factoryReset(filename);
     delay(1000);
   }
   }
