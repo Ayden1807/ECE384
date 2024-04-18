@@ -27,7 +27,7 @@
   // *******************************************************************
   // MY PINS
   #define DHTPIN 16
-  #define LIGHTPIN 13       //Change this when I see fit
+  #define LIGHTPIN 36       //Change this when I see fit
   #define RST 0
   // *******************************************************************
   // Iot Information

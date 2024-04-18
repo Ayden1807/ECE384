@@ -1,4 +1,4 @@
-#define output_Photoresistor 13
+#define output_Photoresistor 36
 
 
 int PR_value;

@@ -1,3 +1,5 @@
+#define DEBUG
+
 #include <WiFi.h>
 #include <WebServer.h>
 #include <LiquidCrystal_PCF8574.h>
@@ -5,6 +7,7 @@
 
 const char *ssid = "ESP32-Access-Point";
 const char *password = "123456789";
+const char *filename = "/wifi.txt";
 
 WebServer server(80);
 
@@ -18,7 +21,7 @@ WebServer server(80);
 
 LiquidCrystal_PCF8574 lcd(LCD_ADDRESS);
 
-const char *filename = "/wifi.txt";
+
 
 void handleRoot() {
   server.send(200, "text/html", "<form action='/submit' method='post'><input type='text' name='ssid' placeholder='Enter SSID'><br><input type='text' name='password' placeholder='Enter Password'><br><input type='submit' value='Submit'></form>");
@@ -30,10 +33,10 @@ void handleSubmit() {
 
   // Connect to the submitted WiFi network
   WiFi.begin(ssid.c_str(), password.c_str());
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
+    while (WiFi.status() != WL_CONNECTED) {
+      delay(500);
+      Serial.print(".");
+    }
 
   // Stop Access Point mode
   WiFi.mode(WIFI_STA);
@@ -53,7 +56,7 @@ void handleSubmit() {
 
 void setup() {
   Serial.begin(115200);
-
+  delay(5000);
   pinMode(RST, INPUT_PULLUP);
 
   // Start ESP32 in Access Point mode
@@ -78,20 +81,24 @@ void setup() {
   server.on("/", handleRoot);
   server.on("/submit", handleSubmit);
 
-  // Initialize SPIFFS
-  // factoryReset();       //This is a debug feature
-
   if (!SPIFFS.begin(true)) {
     Serial.println("An error occurred while mounting SPIFFS");
     return;
   }
 
   // Check if WiFi credentials file exists
-  if (SPIFFS.exists(filename)) {
-    Serial.println("Found existing WiFi credentials file");
-    loadCredentials();
+  // factoryReset(filename);
+  File file = SPIFFS.open(filename, "r");
+  if (file) {
+      if (file.available()) {
+          Serial.println("Found existing WiFi credentials file with content");
+          loadCredentials();
+      } else {
+          Serial.println("Found existing WiFi credentials file, but it's empty");
+      }
+      file.close();
   } else {
-    Serial.println("No existing WiFi credentials file found");
+      Serial.println("No existing WiFi credentials file found");
   }
 
   server.begin();
@@ -104,85 +111,11 @@ void loop() {
 
   if(digitalRead(RST) == LOW){
     Serial.println("RST Button Pressed");
-    factoryReset();
+    factoryReset(filename);
     delay(1000);
   }
   // Code for other functionalities, if any
 }
-
-void saveCredentials(String ssid, String password) {
-  File file = SPIFFS.open(filename, "w");
-  if (!file) {
-    Serial.println("Failed to open file for writing");
-    return;
-  }
-
-  // Save SSID and password to the file
-  file.println(ssid);
-  file.println(password);
-
-  // Close the file
-  file.close();
-
-  Serial.println("WiFi credentials saved to SPIFFS");
-
-  // Debugging: Read and print saved credentials
-  Serial.println("Debugging: Reading saved credentials from SPIFFS:");
-  File debugFile = SPIFFS.open(filename, "r");
-  if (debugFile) {
-    Serial.println("File content:");
-    while (debugFile.available()) {
-      Serial.println(debugFile.readStringUntil('\n'));
-    }
-    debugFile.close();
-  } else {
-    Serial.println("Failed to open file for debugging");
-  }
-}
-
-
-void loadCredentials() {
-  File file = SPIFFS.open(filename, "r");
-  if (!file) {
-    Serial.println("Failed to open file for reading");
-    return;
-  }
-
-  Serial.println("Credentials Saved:");
-  String ssid = file.readStringUntil('\n');
-  Serial.print("ssid: ");
-  Serial.println(ssid);
-  String password = file.readStringUntil('\n');
-  Serial.print("password: ");
-  Serial.println(password);
-
-  // Close the file before attempting to connect to WiFi
-  file.close();
-
-  Serial.print("Connecting to stored WiFi network: ");
-  Serial.println(ssid);
-
-  // Connect to the stored WiFi network
-  WiFi.begin(ssid.c_str(), password.c_str());
-  int attempt = 0;
-  while (WiFi.status() != WL_CONNECTED && attempt < 10) { // Try for a maximum of 10 attempts
-    delay(3000);
-    Serial.print(".");
-    attempt++;
-  }
-
-  if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("");
-    Serial.println("WiFi connected");
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
-  } else {
-    Serial.println("");
-    Serial.println("Failed to connect to WiFi network. Restarting in Access Point mode.");
-    factoryReset();
-  }
-}
-
 
 void printIPAddress() {
   lcd.clear(); // Clear LCD before printing

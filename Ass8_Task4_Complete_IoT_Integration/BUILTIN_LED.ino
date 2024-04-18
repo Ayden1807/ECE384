@@ -1,3 +1,10 @@
+// ************************************************************
+// FIX THIS!!!!! 34, 35, 36, 39 ARE INPUT ONLY!!!!!
+// Status_LED1 --> Blue? = Pin 36
+// Status_LED2 --> White? = Pin 39
+// Status_LED3 --> Red? = Pin 34
+// ************************************************************
+
 // Include the required libraries
 #include <Arduino.h>
 
