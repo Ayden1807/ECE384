@@ -1,3 +1,12 @@
+void handleRoot();
+void handleSubmit();
+void handleTemp();
+void loadCredentials();
+void saveCredentials();
+void printIPAddress();
+void factoryReset(const char* path);
+void clearWifiMemory(const char* path);
+
 void wifiSetup() {
 
   pinMode(RST, INPUT_PULLUP);
@@ -34,6 +43,11 @@ void wifiSetup() {
   server.on("/temp", handleTemp);  // New route for temperature data
 
   // Initialize SPIFFS
+  if (!SPIFFS.begin(true)) {
+    Serial.println("An error occurred while mounting SPIFFS");
+    return;
+  }
+
   // factoryReset();       //This is a debug feature
 
   File file = SPIFFS.open(filename, "r");
@@ -68,4 +82,21 @@ void apSetup(){
 
   server.begin();
   Serial.println("HTTP server started");
+}
+
+void wifiConnect(){
+  File file = SPIFFS.open(filename, "r");
+  if (file) {
+      if (file.available()) {
+          Serial.println("Found existing WiFi credentials file with content");
+          loadCredentials();
+      } else {
+          Serial.println("Found existing WiFi credentials file, but it's empty");
+          wifiSetup();
+      }
+      file.close();
+  } else {
+      Serial.println("No existing WiFi credentials file found");
+      wifiSetup();
+  }
 }

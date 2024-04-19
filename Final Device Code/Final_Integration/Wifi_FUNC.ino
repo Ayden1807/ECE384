@@ -1,3 +1,5 @@
+void printIPAddress();
+
 void handleRoot() {
   server.send(200, "text/html", "<form action='/submit' method='post'><input type='text' name='ssid' placeholder='Enter SSID'><br><input type='text' name='password' placeholder='Enter Password'><br><input type='submit' value='Submit'></form>");
 }

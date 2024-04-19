@@ -29,8 +29,8 @@
   const char *ssid = "ESP32-Access-Point";
   const char *password = "123456789";
 
-  WebServer server(80);
   const char *filename = "/wifi.txt";
+  WebServer server(80);
 
   // *******************************************************************
 

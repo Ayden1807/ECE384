@@ -42,7 +42,8 @@
 
 void wifiSetup();
 void apSetup();
-void clearWifiMemory();
+void clearWifiMemory(const char* path2);
+void wifiConnect();
 
 
 // *********************************************************************
@@ -350,6 +351,7 @@ void LCDML_DISP_setup(LCDML_FUNC_wifi_connect)
   delay(5000);
 
   // wifiSetup();
+  wifiConnect();
 
   // Reset Button Value
   // g_button_value = 0; 
@@ -488,36 +490,37 @@ void LCDML_DISP_loop_end(LCDML_FUNC_p2)
 
 
 
-// *********************************************************************
-unsigned long g_initscreen_example_counter = 0;
-void LCDML_DISP_setup(LCDML_FUNC_initscreen)
-// *********************************************************************
-{
-  // setup function
-  LCDML_DISP_triggerMenu(1000); // set trigger for this function to 1000 millisecounds
-  lcd.print(F("InitScreen"));  // print first line to lcd display
-  g_initscreen_example_counter = 0; // reset or set example counter
-}
+// // *********************************************************************
+// unsigned long g_initscreen_example_counter = 0;
+// void LCDML_DISP_setup(LCDML_FUNC_initscreen)
+// // *********************************************************************
+// {
+//   // setup function
+//   LCDML_DISP_triggerMenu(1000); // set trigger for this function to 1000 millisecounds
+//   lcd.print(F("InitScreen"));  // print first line to lcd display
+//   g_initscreen_example_counter = 0; // reset or set example counter
+// }
 
-void LCDML_DISP_loop(LCDML_FUNC_initscreen) 
-{
-  // loop function, can be run in a loop when LCDML_DISP_triggerMenu(xx) is set
-  // the quit button works in every DISP function without any checks; it starts the loop_end function 
-  g_initscreen_example_counter++; // count the example counter above
-  lcd.setCursor(0,1); // clear the secound line on lcd 
-  lcd.print(F("      "));
-  lcd.setCursor(0,1); // print new value to lcd
-  lcd.print(g_initscreen_example_counter);
+// void LCDML_DISP_loop(LCDML_FUNC_initscreen) 
+// {
+//   // loop function, can be run in a loop when LCDML_DISP_triggerMenu(xx) is set
+//   // the quit button works in every DISP function without any checks; it starts the loop_end function 
+//   g_initscreen_example_counter++; // count the example counter above
+//   lcd.setCursor(0,1); // clear the secound line on lcd 
+//   lcd.print(F("      "));
+//   lcd.setCursor(0,1); // print new value to lcd
+//   lcd.print(g_initscreen_example_counter);
   
-  g_lcdml_initscreen = millis(); // reset initscreen timer
+//   g_lcdml_initscreen = millis(); // reset initscreen timer
   
-  if(LCDML_BUTTON_checkAny()) { // check if any button is pressed to left this function
-    LCDML_DISP_funcend(); // function end    
-  }   
-}
+//   if(LCDML_BUTTON_checkAny()) { // check if any button is pressed to left this function
+//     LCDML_DISP_funcend(); // function end    
+//   }   
+// }
 
-void LCDML_DISP_loop_end(LCDML_FUNC_initscreen) 
-{  
-  // this functions is ever called when a DISP function is quit
-  // you can here reset some global vars or do nothing
-  LCDML.goRoot(); // go to root element (first element of this menu with id=0)
+// void LCDML_DISP_loop_end(LCDML_FUNC_initscreen) 
+// {  
+//   // this functions is ever called when a DISP function is quit
+//   // you can here reset some global vars or do nothing
+//   LCDML.goRoot(); // go to root element (first element of this menu with id=0)
+// 
