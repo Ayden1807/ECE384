@@ -189,3 +189,44 @@ void factoryReset(const char* path) {
 
   Serial.println("Factory reset completed. ESP32 restarted in Access Point mode.");
 }
+
+// ***********************************************************************************************************
+
+void clearWifiMemory(const char* path) {
+  // Clear the contents of the specified file
+  if (SPIFFS.exists(path)) {
+    File file = SPIFFS.open(path, "w");
+    if (!file) {
+      Serial.println("Failed to open file for writing");
+      lcd.clear();
+      lcd.setBacklight(255);
+      lcd.setCursor(0,0);
+      lcd.print("Failed to");
+      lcd.setCursor(0,1);
+      lcd.print("open file");
+      delay(5000);
+      return;
+    }
+    file.close();
+    Serial.println("File cleared successfully");
+    lcd.clear();
+    lcd.setBacklight(255);
+    lcd.setCursor(0,0);
+    lcd.print("Wifi memory");
+    lcd.setCursor(0,1);
+    lcd.print("cleared");
+    delay(5000);
+  } else {
+    Serial.println("File does not exist");
+    lcd.clear();
+    lcd.setBacklight(255);
+    lcd.setCursor(0,0);
+    lcd.print("File doesn't");
+    lcd.setCursor(0,1);
+    lcd.print("exist");
+    delay(5000);
+    return;
+  }
+
+  Serial.println("Wifi memory cleared");
+}

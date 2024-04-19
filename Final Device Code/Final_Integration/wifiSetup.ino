@@ -52,3 +52,20 @@ void wifiSetup() {
   server.begin();
   Serial.println("HTTP server started");
 }
+
+void apSetup(){
+  WiFi.mode(WIFI_AP);
+  WiFi.softAPConfig(IPAddress(192, 168, 4, 1), IPAddress(192, 168, 4, 1), IPAddress(255, 255, 255, 0));
+  WiFi.softAP(ssid, password);
+
+  Serial.println("Access Point Started");
+  Serial.print("AP IP Address: ");
+  Serial.println(WiFi.softAPIP());
+
+  server.on("/", handleRoot);
+  server.on("/submit", handleSubmit);
+  server.on("/temp", handleTemp);  // New route for temperature data
+
+  server.begin();
+  Serial.println("HTTP server started");
+}

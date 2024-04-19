@@ -40,6 +40,11 @@
  * ===================================================================== *
  */
 
+void wifiSetup();
+void apSetup();
+void clearWifiMemory();
+
+
 // *********************************************************************
 // INFORMATION MODE
 // *********************************************************************
@@ -49,10 +54,6 @@ void LCDML_DISP_setup(LCDML_FUNC_information){
   lcd.print(F("Ayden Mosler"));
   lcd.setCursor(0, 1);
   lcd.print(F("Class of 2024"));
-  // lcd.setCursor(0, 2);
-  // lcd.print(F("Taste druecken oder"));
-  // lcd.setCursor(0, 3);
-  // lcd.print(F("Back Taste verwenden"));
 }
 
 void LCDML_DISP_loop(LCDML_FUNC_information) 
@@ -242,6 +243,203 @@ void LCDML_DISP_loop_end(LCDML_FUNC_debug_mode) {
 }
 
 // *********************************************************************
+// WIFI CONNECTION STATUS
+// uint8_t g_button_value = 0; // button value counter (global variable)
+void LCDML_DISP_setup(LCDML_FUNC_wifi_status)
+// *********************************************************************
+{ 
+  // setup function
+  // print lcd content
+  lcd.setCursor(0, 0);
+  lcd.clear();
+  lcd.setBacklight(255);
+
+  if (WiFi.status() == WL_CONNECTED) {
+    lcd.setCursor(0, 0);
+    lcd.print("WiFi Connected");
+    lcd.setCursor(0,1);
+    lcd.print("IP:");
+    lcd.print(WiFi.localIP());
+  } else if (WiFi.getMode() == WIFI_AP){
+    lcd.setCursor(0,0);
+    lcd.print("AP Connected");
+    lcd.setCursor(0,1);
+    lcd.print("IP:");
+    lcd.print(WiFi.softAPIP());
+  } else{
+    lcd.setCursor(0,0);
+    lcd.print("Wifi Status:");
+    lcd.setCursor(0,1);
+    lcd.print("Offline");
+  }
+  // Reset Button Value
+  // g_button_value = 0; 
+}
+
+void LCDML_DISP_loop(LCDML_FUNC_wifi_status)
+{
+    if (LCDML_BUTTON_checkUp() || LCDML_BUTTON_checkDown()) {
+    LCDML_BUTTON_resetLeft();
+    LCDML_BUTTON_resetRight();
+    LCDML_DISP_funcend();
+  }
+}
+
+void LCDML_DISP_loop_end(LCDML_FUNC_wifi_status) 
+{
+  lcd.setCursor(0, 0);
+  lcd.clear();
+  lcd.setBacklight(255);
+}
+
+// *********************************************************************
+// ACCESS POINT MODE
+void LCDML_DISP_setup(LCDML_FUNC_ap_connect)
+// *********************************************************************
+{ 
+  // setup function
+  // print lcd content
+  apSetup();
+
+  lcd.clear();
+  lcd.setBacklight(255);
+  lcd.setCursor(0,0);
+  lcd.print("Access Point");
+  lcd.setCursor(0,1);
+  lcd.print("Mode");
+  delay(5000);
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("AP IP:");
+  lcd.setCursor(0,1);
+  lcd.print(WiFi.softAPIP());
+
+  // Reset Button Value
+  // g_button_value = 0; 
+}
+
+void LCDML_DISP_loop(LCDML_FUNC_ap_connect)
+{
+    if (LCDML_BUTTON_checkUp() || LCDML_BUTTON_checkDown()) {
+    LCDML_BUTTON_resetLeft();
+    LCDML_BUTTON_resetRight();
+    LCDML_DISP_funcend();
+  }
+}
+
+void LCDML_DISP_loop_end(LCDML_FUNC_ap_connect) 
+{
+  lcd.setCursor(0, 0);
+  lcd.clear();
+  lcd.setBacklight(255);
+}
+
+// *********************************************************************
+// WIFI CONNECTION MODE
+void LCDML_DISP_setup(LCDML_FUNC_wifi_connect)
+// *********************************************************************
+{ 
+  // setup function
+  // print lcd content
+  lcd.clear();
+  lcd.setBacklight(255);
+  lcd.setCursor(0,0);
+  lcd.print("Wifi Connect");
+  lcd.setCursor(0,1);
+  lcd.print("Mode");
+  delay(5000);
+
+  // wifiSetup();
+
+  // Reset Button Value
+  // g_button_value = 0; 
+}
+
+void LCDML_DISP_loop(LCDML_FUNC_wifi_connect)
+{
+    if (LCDML_BUTTON_checkUp() || LCDML_BUTTON_checkDown()) {
+    LCDML_BUTTON_resetLeft();
+    LCDML_BUTTON_resetRight();
+    LCDML_DISP_funcend();
+  }
+}
+void LCDML_DISP_loop_end(LCDML_FUNC_wifi_connect) 
+{
+  lcd.setCursor(0, 0);
+  lcd.clear();
+  lcd.setBacklight(255);
+}
+
+// *********************************************************************
+// WIFI CLEAR MEMORY
+void LCDML_DISP_setup(LCDML_FUNC_wifi_clear_memory)
+// *********************************************************************
+{ 
+  // setup function
+  // print lcd content
+  
+  clearWifiMemory(filename);
+
+
+  // Reset Button Value
+  // g_button_value = 0; 
+}
+
+void LCDML_DISP_loop(LCDML_FUNC_wifi_clear_memory)
+{
+    if (LCDML_BUTTON_checkUp() || LCDML_BUTTON_checkDown()) {
+    LCDML_BUTTON_resetLeft();
+    LCDML_BUTTON_resetRight();
+    LCDML_DISP_funcend();
+  }
+}
+
+void LCDML_DISP_loop_end(LCDML_FUNC_wifi_clear_memory) 
+{
+  lcd.setCursor(0, 0);
+  lcd.clear();
+  lcd.setBacklight(255);
+}
+
+// *********************************************************************
+// DISCONNECT
+void LCDML_DISP_setup(LCDML_FUNC_disconnect)
+// *********************************************************************
+{ 
+  // setup function
+  // print lcd content
+  
+  WiFi.disconnect();
+  WiFi.softAPdisconnect(true);
+  
+  lcd.clear();
+  lcd.setBacklight(255);
+  lcd.setCursor(0,0);
+  lcd.print("Device is");
+  lcd.setCursor(0,1);
+  lcd.print("Offline");
+  delay(5000);
+  // Reset Button Value
+  // g_button_value = 0; 
+}
+
+void LCDML_DISP_loop(LCDML_FUNC_disconnect)
+{
+    if (LCDML_BUTTON_checkUp() || LCDML_BUTTON_checkDown()) {
+    LCDML_BUTTON_resetLeft();
+    LCDML_BUTTON_resetRight();
+    LCDML_DISP_funcend();
+  }
+}
+
+void LCDML_DISP_loop_end(LCDML_FUNC_disconnect) 
+{
+  lcd.setCursor(0, 0);
+  lcd.clear();
+  lcd.setBacklight(255);
+}
+
+// *********************************************************************
 uint8_t g_button_value = 0; // button value counter (global variable)
 void LCDML_DISP_setup(LCDML_FUNC_p2)
 // *********************************************************************
@@ -323,4 +521,3 @@ void LCDML_DISP_loop_end(LCDML_FUNC_initscreen)
   // this functions is ever called when a DISP function is quit
   // you can here reset some global vars or do nothing
   LCDML.goRoot(); // go to root element (first element of this menu with id=0)
-}

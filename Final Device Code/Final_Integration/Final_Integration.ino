@@ -66,7 +66,7 @@
   // create menu
   // menu element count - last element id
   // this value must be the same as the last menu element
-  #define _LCDML_DISP_cnt    2
+  #define _LCDML_DISP_cnt    8
   
   // LCDML_root        => layer 0 
   // LCDML_root_X      => layer 1 
@@ -76,12 +76,15 @@
   
   // LCDMenuLib_add(id, group, prev_layer_element, new_element_num, lang_char_array, callback_function)
   LCDML_DISP_init(_LCDML_DISP_cnt);
-  LCDML_DISP_add      (0  , _LCDML_G1  , LCDML_root        , 1  , "Information"        , LCDML_FUNC_information);
+  LCDML_DISP_add      (0  , _LCDML_G1  , LCDML_root        , 1  , "Creator Info"       , LCDML_FUNC_information);
   LCDML_DISP_add      (1  , _LCDML_G1  , LCDML_root        , 2  , "Normal Mode"        , LCDML_FUNC_normal_mode);
   LCDML_DISP_add      (2  , _LCDML_G1  , LCDML_root        , 3  , "Debug Mode"         , LCDML_FUNC_debug_mode);
-  // LCDML_DISP_add      (3  , _LCDML_G1  , LCDML_root        , 4  , "Program"            , LCDML_FUNC);
-  // LCDML_DISP_add      (4  , _LCDML_G1  , LCDML_root_4      , 1  , "Program 1"          , LCDML_FUNC);
-  // LCDML_DISP_add      (5  , _LCDML_G1  , LCDML_root_4_1    , 1  , "P1 start"           , LCDML_FUNC);
+  LCDML_DISP_add      (3  , _LCDML_G1  , LCDML_root        , 4  , "WiFi Settings"      , LCDML_FUNC);
+  LCDML_DISP_add      (4  , _LCDML_G1  , LCDML_root_4      , 1  , "Conn. Status"             , LCDML_FUNC_wifi_status);
+  LCDML_DISP_add      (5  , _LCDML_G1  , LCDML_root_4      , 2  , "Conn. to AP"      , LCDML_FUNC_ap_connect);
+  LCDML_DISP_add      (6  , _LCDML_G1  , LCDML_root_4      , 3  , "Conn. to WiFi"    , LCDML_FUNC_wifi_connect);
+  LCDML_DISP_add      (7  , _LCDML_G1  , LCDML_root_4      , 4  , "Delete Saved"  , LCDML_FUNC_wifi_clear_memory);
+  LCDML_DISP_add      (8  , _LCDML_G1  , LCDML_root_4      , 5  , "Disconnect"         , LCDML_FUNC_disconnect);
   // LCDML_DISP_add      (6  , _LCDML_G1  , LCDML_root_4_1    , 2  , "Settings"           , LCDML_FUNC);
   // LCDML_DISP_add      (7  , _LCDML_G1  , LCDML_root_4_1_2  , 1  , "Warm"               , LCDML_FUNC);
   // LCDML_DISP_add      (8  , _LCDML_G1  , LCDML_root_4_1_2  , 2  , "Long"               , LCDML_FUNC);
@@ -102,6 +105,8 @@
   LCDML_BACK_new_timebased_dynamic (1  , ( 1000UL )       , _LCDML_stop   , LCDML_BACKEND_menu);
   LCDML_BACK_create();
 
+  void wifiSetup();
+  void factoryReset(const char* filename);
 
 // *********************************************************************
 // SETUP
