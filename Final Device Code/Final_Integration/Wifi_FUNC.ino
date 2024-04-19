@@ -144,6 +144,14 @@ void loadCredentials() {
     Serial.println("WiFi connected");
     Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
+    lcd.clear();
+    lcd.setBacklight(255);
+    lcd.setCursor(0,0);
+    lcd.print("Wifi Connected");
+    lcd.setCursor(0,1);
+    lcd.print("IP: ");
+    lcd.print(WiFi.localIP());
+    delay(5000);
     WiFi.mode(WIFI_STA);
     WiFi.softAPdisconnect(true);
   } else {
