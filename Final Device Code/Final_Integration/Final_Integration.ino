@@ -10,6 +10,7 @@
   // #define DEBUG_WIFI
 
   // include libs
+  #include <ESP.h>
   #include <WiFi.h>
   #include <WebServer.h>
   #include <SPIFFS.h>
@@ -66,7 +67,7 @@
   // create menu
   // menu element count - last element id
   // this value must be the same as the last menu element
-  #define _LCDML_DISP_cnt    8
+  #define _LCDML_DISP_cnt    11
   
   // LCDML_root        => layer 0 
   // LCDML_root_X      => layer 1 
@@ -80,11 +81,14 @@
   LCDML_DISP_add      (1  , _LCDML_G1  , LCDML_root        , 2  , "Normal Mode"        , LCDML_FUNC_normal_mode);
   LCDML_DISP_add      (2  , _LCDML_G1  , LCDML_root        , 3  , "Debug Mode"         , LCDML_FUNC_debug_mode);
   LCDML_DISP_add      (3  , _LCDML_G1  , LCDML_root        , 4  , "WiFi Settings"      , LCDML_FUNC);
-  LCDML_DISP_add      (4  , _LCDML_G1  , LCDML_root_4      , 1  , "Conn. Status"             , LCDML_FUNC_wifi_status);
-  LCDML_DISP_add      (5  , _LCDML_G1  , LCDML_root_4      , 2  , "Conn. to AP"      , LCDML_FUNC_ap_connect);
-  LCDML_DISP_add      (6  , _LCDML_G1  , LCDML_root_4      , 3  , "Conn. to WiFi"    , LCDML_FUNC_wifi_connect);
-  LCDML_DISP_add      (7  , _LCDML_G1  , LCDML_root_4      , 4  , "Delete Saved"  , LCDML_FUNC_wifi_clear_memory);
+  LCDML_DISP_add      (4  , _LCDML_G1  , LCDML_root_4      , 1  , "Conn. Status"       , LCDML_FUNC_wifi_status);
+  LCDML_DISP_add      (5  , _LCDML_G1  , LCDML_root_4      , 2  , "Conn. to AP"        , LCDML_FUNC_ap_connect);
+  LCDML_DISP_add      (6  , _LCDML_G1  , LCDML_root_4      , 3  , "Conn. to WiFi"      , LCDML_FUNC_wifi_connect);
+  LCDML_DISP_add      (7  , _LCDML_G1  , LCDML_root_4      , 4  , "Delete Saved"       , LCDML_FUNC_wifi_clear_memory);
   LCDML_DISP_add      (8  , _LCDML_G1  , LCDML_root_4      , 5  , "Disconnect"         , LCDML_FUNC_disconnect);
+  LCDML_DISP_add      (9  , _LCDML_G1  , LCDML_root        , 5  , "WS Settings"        , LCDML_FUNC);
+  LCDML_DISP_add      (10 , _LCDML_G1  , LCDML_root_5      , 1  , "Reboot"             , LCDML_FUNC_reboot);
+  LCDML_DISP_add      (11 , _LCDML_G1  , LCDML_root_5      , 2  , "Factory Reset"      , LCDML_FUNC_factory_reset);
   // LCDML_DISP_add      (6  , _LCDML_G1  , LCDML_root_4_1    , 2  , "Settings"           , LCDML_FUNC);
   // LCDML_DISP_add      (7  , _LCDML_G1  , LCDML_root_4_1_2  , 1  , "Warm"               , LCDML_FUNC);
   // LCDML_DISP_add      (8  , _LCDML_G1  , LCDML_root_4_1_2  , 2  , "Long"               , LCDML_FUNC);
@@ -106,7 +110,7 @@
   LCDML_BACK_create();
 
   void wifiSetup();
-  void factoryReset(const char* filename);
+  void wifiFactoryReset(const char* filename);
 
 // *********************************************************************
 // SETUP
@@ -160,7 +164,7 @@
 
   if(digitalRead(RST) == LOW){
     Serial.println("RST Button Pressed");
-    factoryReset(filename);
+    wifiFactoryReset(filename);
     delay(1000);
   }
   }

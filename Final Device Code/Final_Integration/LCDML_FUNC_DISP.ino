@@ -442,53 +442,70 @@ void LCDML_DISP_loop_end(LCDML_FUNC_disconnect)
 }
 
 // *********************************************************************
-uint8_t g_button_value = 0; // button value counter (global variable)
-void LCDML_DISP_setup(LCDML_FUNC_p2)
+// REBOOT
+void LCDML_DISP_setup(LCDML_FUNC_reboot)
 // *********************************************************************
 { 
-  // setup function
-  // print lcd content
+  Serial.println("ESP32 Rebooting...");
   lcd.setCursor(0, 0);
-  lcd.print(F("press left or up"));  
+  lcd.clear();
+  lcd.setBacklight(255);
+  lcd.print("Device");
   lcd.setCursor(0, 1);
-  lcd.print(F("count: 0 of 3"));
-  // Reset Button Value
-  g_button_value = 0; 
+  lcd.print("Rebooting");
+  delay(3000);
 }
 
-void LCDML_DISP_loop(LCDML_FUNC_p2)
+void LCDML_DISP_loop(LCDML_FUNC_reboot)
 {
-  // loop function, can be run in a loop when LCDML_DISP_triggerMenu(xx) is set
-  // the quit button works in every DISP function without any checks; it starts the loop_end function 
-  
-  if (LCDML_BUTTON_checkAny()) // check if any button is pressed (enter, up, down, left, right)
-  {
-    if (LCDML_BUTTON_checkLeft() || LCDML_BUTTON_checkUp()) // check if button left is pressed
-    {
-      LCDML_BUTTON_resetLeft(); // reset the left button
-      LCDML_BUTTON_resetUp(); // reset the left button
-      g_button_value++;
-      
-      // update lcd content
-      lcd.setCursor(7, 1); // set cursor   
-      lcd.print(g_button_value); // print change content
-    }    
-  }
-  
-  // check if button count is three
-  if (g_button_value >= 3) {
-    // end function for callback
-    LCDML_DISP_funcend();   
-  } 
+  ESP.restart();
 }
 
-void LCDML_DISP_loop_end(LCDML_FUNC_p2) 
+void LCDML_DISP_loop_end(LCDML_FUNC_reboot) 
 {
   // this functions is ever called when a DISP function is quit
   // you can here reset some global vars or do nothing
 }
 
+// *********************************************************************
+// FACTORY RESET
+void LCDML_DISP_setup(LCDML_FUNC_factory_reset)
+// *********************************************************************
+{ 
+  Serial.println("ESP32 Factory Reset...");
+  lcd.setCursor(0, 0);
+  lcd.clear();
+  lcd.setBacklight(255);
+  lcd.print("Attempting to");
+  lcd.setCursor(0, 1);
+  lcd.print("Factory RST");
+  delay(3000);
 
+  clearWifiMemory(filename);
+  delay(2000);
+  // ADD clearHistoricalMemory();
+  // delay(2000);
+  // ADD any other fields that need to be cleared...
+  Serial.println("ESP32 Factory Reset Complete");
+  lcd.setCursor(0, 0);
+  lcd.clear();
+  lcd.setBacklight(255);
+  lcd.print("Factory RST");
+  lcd.setCursor(0, 1);
+  lcd.print("Complete");
+  delay(3000);
+}
+
+void LCDML_DISP_loop(LCDML_FUNC_factory_reset)
+{
+
+}
+
+void LCDML_DISP_loop_end(LCDML_FUNC_factory_reset) 
+{
+  // this functions is ever called when a DISP function is quit
+  // you can here reset some global vars or do nothing
+}
 
 // // *********************************************************************
 // unsigned long g_initscreen_example_counter = 0;
@@ -523,4 +540,4 @@ void LCDML_DISP_loop_end(LCDML_FUNC_p2)
 //   // this functions is ever called when a DISP function is quit
 //   // you can here reset some global vars or do nothing
 //   LCDML.goRoot(); // go to root element (first element of this menu with id=0)
-// 
+// }

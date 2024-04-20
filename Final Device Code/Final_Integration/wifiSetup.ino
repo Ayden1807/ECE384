@@ -4,7 +4,7 @@ void handleTemp();
 void loadCredentials();
 void saveCredentials();
 void printIPAddress();
-void factoryReset(const char* path);
+void wifiFactoryReset(const char* path);
 void clearWifiMemory(const char* path);
 
 void wifiSetup() {
@@ -48,7 +48,7 @@ void wifiSetup() {
     return;
   }
 
-  // factoryReset();       //This is a debug feature
+  // wifiFactoryReset();       //This is a debug feature
 
   File file = SPIFFS.open(filename, "r");
   if (file) {

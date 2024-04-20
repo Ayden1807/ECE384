@@ -178,7 +178,7 @@ void printIPAddress() {
 
 // ***********************************************************************************************************
 
-void factoryReset(const char* path) {
+void wifiFactoryReset(const char* path) {
   // Clear the contents of the specified file
   if (SPIFFS.exists(path)) {
     File file = SPIFFS.open(path, "w");
@@ -197,7 +197,7 @@ void factoryReset(const char* path) {
   WiFi.mode(WIFI_AP);
   WiFi.softAP(ssid, password);
 
-  Serial.println("Factory reset completed. ESP32 restarted in Access Point mode.");
+  Serial.println("Wifi factory reset completed. ESP32 restarted in Access Point mode.");
 }
 
 // ***********************************************************************************************************
