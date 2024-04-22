@@ -170,6 +170,11 @@ void LCDML_DISP_loop_end(LCDML_FUNC_request_mode) {
 // CONSTANT MODE
 
 int constantTime = 0;
+float tempSum = 0.0;
+float humidSum = 0.0;
+float pressSum = 0.0;
+int lightSum = 0;
+int sampleCount = 0;
 // *********************************************************************
 void LCDML_DISP_setup(LCDML_FUNC_constant_mode){
   // setup function   
@@ -185,13 +190,18 @@ void LCDML_DISP_setup(LCDML_FUNC_constant_mode){
   // starts a trigger event for the loop function every 1 secounds
   LCDML_DISP_triggerMenu(1000);
   constantTime = 0;
+  
+  tempSum = 0.0;
+  humidSum = 0.0;
+  pressSum = 0.0;
+  lightSum = 0;
+  sampleCount = 0;
 }
 
 void LCDML_DISP_loop(LCDML_FUNC_constant_mode){ 
   float DHT11_temp = dht11.readTemperature();
   float humid = dht11.readHumidity();
   float press = bmp.readPressure() / 100.0;   //convert Pa to hPa for space saving
-  // float BMP280_temp = bmp.readTemperature();
   int lightIntensity = analogRead(LIGHTPIN);
   String lightIntensity_string = "V.Dark";
 
@@ -220,11 +230,42 @@ void LCDML_DISP_loop(LCDML_FUNC_constant_mode){
     lightIntensity_string.replace("V.Dark", "V.Bright");
   }
 
+  // Summing for avg
+  tempSum += DHT11_temp;
+  pressSum += press;
+  humidSum += humid;
+  lightSum += lightIntensity;
+  sampleCount++;
+
+  // Calc avg and save it to memory
+  if(sampleCount == 10){
+    float avgTemp = tempSum / 10;
+    float avgPress = pressSum / 10;
+    float avgHumid = humidSum / 10;
+    int avgLight = lightSum / 10;
+
+    tempSum = 0.0;
+    pressSum = 0.0;
+    humidSum = 0.0;
+    lightSum = 0;
+    sampleCount = 0;
+    lightIntensity_string = "V.Dark";
+
+    if(avgLight > 2800){
+      lightIntensity_string = "V.Dark";
+    } else if(lightIntensity > 1000){
+      lightIntensity_string.replace("V.Dark", "Dark");
+    } else if(lightIntensity > 400){
+      lightIntensity_string.replace("V.Dark","Bright");
+    } else{
+      lightIntensity_string.replace("V.Dark", "V.Bright");
+    }
+
+    constantMemory(constantTime, avgTemp, avgHumid, avgPress, lightIntensity_string);
+    constantTime++;
+  }
+
   delay(60000);
-
-  constantMemory(constantTime, DHT11_temp, humid, press, lightIntensity_string);
-  constantTime++;
-
 
   if (LCDML_BUTTON_checkUp() || LCDML_BUTTON_checkDown()) {
     LCDML_BUTTON_resetLeft();

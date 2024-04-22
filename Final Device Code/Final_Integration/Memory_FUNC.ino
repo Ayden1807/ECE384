@@ -139,7 +139,7 @@ void constantMemory(int currentTime, float DHT11_temp, float humid, float press,
     dataFile.print(",");
     dataFile.println(lightIntensity_string);
     dataFile.close();
-    Serial.println("Data written to constantMemory.csv");
+    Serial.println("Average data written to constantMemory.csv");
 
   } else {
     Serial.println("Error opening constantMemory.csv");

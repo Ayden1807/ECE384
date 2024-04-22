@@ -21,6 +21,77 @@ void handleTemp() {
 
 // ***********************************************************************************************************
 
+void handleRMM() {
+  if (server.method() != HTTP_POST) {
+    server.send(405, "text/plain", "Method Not Allowed");
+    return;
+  }
+
+  WiFiClient client = server.client();
+
+  Serial.println("New client connected");
+
+  if (!client.connected()) {
+    Serial.println("Client disconnected");
+    return;
+  }
+
+  // Read the HTTP request
+  String httpRequest = "";
+  while (client.connected()) {
+    if (client.available()) {
+      char c = client.read();
+      httpRequest += c;
+      if (c == '\n') {
+        break;
+      }
+    }
+  }
+
+  Serial.println("Full HTTP request:");
+  Serial.println(httpRequest);
+
+  // Read file contents
+  File dataFile = SD.open("/constantMemory.csv", FILE_READ);
+  
+  if (dataFile) {
+    String httpResponse = "HTTP/1.1 200 OK\r\n";
+    httpResponse += "Content-Type: text/csv\r\n";
+    httpResponse += "Connection: close\r\n\r\n";
+
+    // Read file contents and append to HTTP response
+    while (dataFile.available()) {
+      httpResponse += (char)dataFile.read();
+    }
+
+    dataFile.close();
+
+    // Send HTTP response
+    client.print(httpResponse);
+    Serial.println("HTTP response sent");
+  } else {
+    String httpResponse = "HTTP/1.1 404 Not Found\r\n";
+    httpResponse += "Connection: close\r\n\r\n";
+    httpResponse += "File not found";
+
+    // Send HTTP response
+    client.print(httpResponse);
+    Serial.println("File not found response sent");
+  }
+
+  // Close the connection
+  client.stop();
+  Serial.println("Client disconnected");
+}
+
+void handleNotFound() {
+  String message = "Not found: " + server.uri();
+  Serial.println(message);
+  server.send(404, "text/plain", message);
+}
+
+// ***********************************************************************************************************
+
 void handleSubmit() {
   String ssid = server.arg("ssid");
   String password = server.arg("password");
