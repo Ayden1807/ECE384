@@ -44,6 +44,12 @@ void wifiSetup();
 void apSetup();
 void clearWifiMemory(const char* path2);
 void wifiConnect();
+void setupRequestMemory();
+void requestMemory(int currentTime, float DHT11_temp, float humid, float press, String lightIntensity_string);
+void printRequestMemory();
+void setupConstantMemory();
+void constantMemory(int currentTime, float DHT11_temp, float humid, float press, String lightIntensity_string);
+void printConstantMemory();
 
 
 // *********************************************************************
@@ -76,32 +82,37 @@ void LCDML_DISP_loop_end(LCDML_FUNC_information)
 
 
 // *********************************************************************
-// NORMAL MODE
+// REQUEST MODE
 DHT11 dht11(DHTPIN);
 Adafruit_BMP280 bmp;
 unsigned long lastButtonTime = 0;
 unsigned long debounceDelay = 100;
+int requestTime = 0;
 // *********************************************************************
-void LCDML_DISP_setup(LCDML_FUNC_normal_mode){
+void LCDML_DISP_setup(LCDML_FUNC_request_mode){
   // setup function   
   bmp.begin(BMP280_ADDRESS_ALT,  BMP280_CHIPID);
   lcd.setCursor(0, 0);
-  lcd.print(F("NORMAL MODE"));
+  lcd.print(F("REQUEST MODE"));
   lcd.setCursor(0, 1);
   lcd.print(F("ACTIVATED"));
   delay(5000);
   lcd.setBacklight(0);
 
+  setupRequestMemory();
   // starts a trigger event for the loop function every 1 secounds
   LCDML_DISP_triggerMenu(1000);
+  requestTime = 0;
 }
 
-void LCDML_DISP_loop(LCDML_FUNC_normal_mode){ 
+void LCDML_DISP_loop(LCDML_FUNC_request_mode){ 
   float DHT11_temp = dht11.readTemperature();
   float humid = dht11.readHumidity();
   float press = bmp.readPressure() / 100.0;   //convert Pa to hPa for space saving
-  float BMP280_temp = bmp.readTemperature();
+  // float BMP280_temp = bmp.readTemperature();
   int lightIntensity = analogRead(LIGHTPIN);
+  String lightIntensity_string = "V.Dark";
+
 
 unsigned long currentMillis = millis();
 
@@ -124,19 +135,23 @@ unsigned long currentMillis = millis();
         lcd.print("V.Dark");
       } else if(lightIntensity > 1000){
         lcd.print("Dark");
+        lightIntensity_string.replace("V.Dark", "Dark");
       } else if(lightIntensity > 400){
         lcd.print("Bright");
+        lightIntensity_string.replace("V.Dark","Bright");
       } else{
         lcd.print("V.Bright");
+        lightIntensity_string.replace("V.Dark", "V.Bright");
       }
 
       delay(5000);
       lcd.setBacklight(0);
       lcd.clear();
       lastButtonTime = currentMillis;
-    }
 
-  
+      requestMemory(requestTime, DHT11_temp, humid, press, lightIntensity_string);
+      requestTime++;
+    }
 
   if (LCDML_BUTTON_checkUp() || LCDML_BUTTON_checkDown()) {
     LCDML_BUTTON_resetLeft();
@@ -146,17 +161,85 @@ unsigned long currentMillis = millis();
   }
 }
 
-void LCDML_DISP_loop_end(LCDML_FUNC_normal_mode) {
+void LCDML_DISP_loop_end(LCDML_FUNC_request_mode) {
   lcd.setBacklight(255);
+  printRequestMemory();
 }
 
+// *********************************************************************
+// CONSTANT MODE
+
+int constantTime = 0;
+// *********************************************************************
+void LCDML_DISP_setup(LCDML_FUNC_constant_mode){
+  // setup function   
+  bmp.begin(BMP280_ADDRESS_ALT,  BMP280_CHIPID);
+  lcd.setCursor(0, 0);
+  lcd.print(F("CONSTANT MODE"));
+  lcd.setCursor(0, 1);
+  lcd.print(F("ACTIVATED"));
+  delay(5000);
+  lcd.setBacklight(0);
+
+  setupConstantMemory();
+  // starts a trigger event for the loop function every 1 secounds
+  LCDML_DISP_triggerMenu(1000);
+  constantTime = 0;
+}
+
+void LCDML_DISP_loop(LCDML_FUNC_constant_mode){ 
+  float DHT11_temp = dht11.readTemperature();
+  float humid = dht11.readHumidity();
+  float press = bmp.readPressure() / 100.0;   //convert Pa to hPa for space saving
+  // float BMP280_temp = bmp.readTemperature();
+  int lightIntensity = analogRead(LIGHTPIN);
+  String lightIntensity_string = "V.Dark";
+
+  lcd.clear();
+  lcd.setBacklight(255);
+  Serial.println("SENSORS SAMPLED");
+  lcd.setCursor(0, 0);
+  lcd.print(DHT11_temp);
+  lcd.write(223);
+  lcd.print("C  ");
+  lcd.print(humid);
+  lcd.print("%");
+  lcd.setCursor(0, 1);
+  lcd.print(press);
+  lcd.print("hPa  ");
+  if(lightIntensity > 2800){
+    lcd.print("V.Dark");
+  } else if(lightIntensity > 1000){
+    lcd.print("Dark");
+    lightIntensity_string.replace("V.Dark", "Dark");
+  } else if(lightIntensity > 400){
+    lcd.print("Bright");
+    lightIntensity_string.replace("V.Dark","Bright");
+  } else{
+    lcd.print("V.Bright");
+    lightIntensity_string.replace("V.Dark", "V.Bright");
+  }
+
+  delay(60000);
+
+  constantMemory(constantTime, DHT11_temp, humid, press, lightIntensity_string);
+  constantTime++;
+
+
+  if (LCDML_BUTTON_checkUp() || LCDML_BUTTON_checkDown()) {
+    LCDML_BUTTON_resetLeft();
+    LCDML_BUTTON_resetRight();
+    LCDML_DISP_funcend();
+  }   
+}
+
+void LCDML_DISP_loop_end(LCDML_FUNC_constant_mode) {
+  lcd.setBacklight(255);
+  printConstantMemory();
+}
 
 //===================================================================== *
 // DEBUG_MODE
-// DHT11 dht11(DHTPIN);
-// Adafruit_BMP280 bmp;
-// unsigned long lastButtonTime = 0;
-// unsigned long debounceDelay = 100;
 //===================================================================== *
 void LCDML_DISP_setup(LCDML_FUNC_debug_mode) {
   // setup
