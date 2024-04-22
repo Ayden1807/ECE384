@@ -39,10 +39,14 @@ void wifiSetup() {
 
   // Setup server routes
   server.on("/", handleRoot);
-  server.on("/submit", handleSubmit);
-  server.on("/temp", handleTemp);  // New route for temperature data
-  server.on("/requestModeMemory", HTTP_POST, handleRMM);
   server.onNotFound(handleNotFound);     // Not found handler
+  server.on("/submit", handleSubmit);
+  server.on("/temp", handleTemp);  
+  server.on("/press", handlePress);
+  server.on("/humid", handleHumid);
+  server.on("/light", handleLight);
+
+  // server.on("/requestModeMemory", HTTP_POST, handleRMM);
   // server.on("/constantModeMemory", handleCMM);
 
   // Initialize SPIFFS

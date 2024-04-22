@@ -50,7 +50,7 @@ void printRequestMemory();
 void setupConstantMemory();
 void constantMemory(int currentTime, float DHT11_temp, float humid, float press, String lightIntensity_string);
 void printConstantMemory();
-void storeTemp(float temp);
+void storeData(float temp, float press, float humid, String lightIntensity_string);
 
 
 // *********************************************************************
@@ -152,7 +152,7 @@ unsigned long currentMillis = millis();
 
       requestMemory(requestTime, DHT11_temp, humid, press, lightIntensity_string);
       requestTime++;
-      storeTemp(DHT11_temp);
+      storeData(DHT11_temp, humid, press, lightIntensity_string);
 
     }
 
@@ -266,6 +266,8 @@ void LCDML_DISP_loop(LCDML_FUNC_constant_mode){
 
     constantMemory(constantTime, avgTemp, avgHumid, avgPress, lightIntensity_string);
     constantTime++;
+
+    storeData(DHT11_temp, humid, press, lightIntensity_string);
   }
 
   delay(60000);
