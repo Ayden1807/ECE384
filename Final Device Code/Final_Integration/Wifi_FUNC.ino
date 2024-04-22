@@ -13,11 +13,8 @@ void handleRoot() {
 void handleTemp() {
   float temperature = returnTemp();
 
-
   if (!isnan(temperature)) {  // Check if the temperature reading is valid
-    String response = "<html><head><meta charset='UTF-8'><style>body { font-size: 24px; }</style></head><body>";
-    response += String(temperature, 2);  // Round temperature to 2 decimal places
-    response += "</body></html>";
+    String response = String(temperature, 2);  // Round temperature to 2 decimal places
     server.send(200, "text/html; charset=utf-8", response);  // Send temperature as response with UTF-8 encoding
   } else {
     server.send(500, "text/plain", "Error: Failed to read temperature data");  // Send an error response
@@ -29,11 +26,8 @@ void handleTemp() {
 void handlePress() {
   float pressure = returnPress();
 
-
   if (!isnan(pressure)) {  // Check if the pressure reading is valid
-    String response = "<html><head><meta charset='UTF-8'><style>body { font-size: 24px; }</style></head><body>";
-    response += String(pressure, 2);  // Round pressure to 2 decimal places
-    response += "</body></html>";
+    String response = String(pressure, 2);  // Round pressure to 2 decimal places
     server.send(200, "text/html; charset=utf-8", response);  // Send pressure as response with UTF-8 encoding
   } else {
     server.send(500, "text/plain", "Error: Failed to read pressure data");  // Send an error response
@@ -45,11 +39,8 @@ void handlePress() {
 void handleHumid() {
   float humidity = returnHumid();
 
-
   if (!isnan(humidity)) {  // Check if the humidity reading is valid
-    String response = "<html><head><meta charset='UTF-8'><style>body { font-size: 24px; }</style></head><body>";
-    response += String(humidity, 2);  // Round humidity to 2 decimal places
-    response += "</body></html>";
+    String response = String(humidity, 2);  // Round humidity to 2 decimal places
     server.send(200, "text/html; charset=utf-8", response);  // Send humidity as response with UTF-8 encoding
   } else {
     server.send(500, "text/plain", "Error: Failed to read humidity data");  // Send an error response
@@ -61,11 +52,8 @@ void handleHumid() {
 void handleLight() {
   String light = returnLight();
 
-
   if (light == "V.Dark" || light == "Dark" || light == "Bright" || light == "V.Bright") {  // Check if the light reading is valid
-    String response = "<html><head><meta charset='UTF-8'><style>body { font-size: 24px; }</style></head><body>";
-    response += light;
-    response += "</body></html>";
+    String response = light;
     server.send(200, "text/html; charset=utf-8", response);  // Send light as response with UTF-8 encoding
   } else {
     server.send(500, "text/plain", "Error: Failed to read light data");  // Send an error response

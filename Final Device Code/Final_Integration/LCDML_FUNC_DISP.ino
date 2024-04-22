@@ -152,7 +152,7 @@ unsigned long currentMillis = millis();
 
       requestMemory(requestTime, DHT11_temp, humid, press, lightIntensity_string);
       requestTime++;
-      storeData(DHT11_temp, humid, press, lightIntensity_string);
+      storeData(DHT11_temp, press, humid, lightIntensity_string);
 
     }
 
@@ -267,7 +267,7 @@ void LCDML_DISP_loop(LCDML_FUNC_constant_mode){
     constantMemory(constantTime, avgTemp, avgHumid, avgPress, lightIntensity_string);
     constantTime++;
 
-    storeData(DHT11_temp, humid, press, lightIntensity_string);
+    storeData(DHT11_temp, press, humid, lightIntensity_string);
   }
 
   delay(60000);
