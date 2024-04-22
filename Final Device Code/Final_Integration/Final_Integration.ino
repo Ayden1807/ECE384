@@ -28,6 +28,7 @@
   #define DHTPIN 16
   #define LIGHTPIN 36       //Change this when I see fit
   #define RST 0
+
   // *******************************************************************
   // Iot Information
   const char *ssid = "ESP32-Access-Point";

@@ -50,6 +50,7 @@ void printRequestMemory();
 void setupConstantMemory();
 void constantMemory(int currentTime, float DHT11_temp, float humid, float press, String lightIntensity_string);
 void printConstantMemory();
+void storeTemp(float temp);
 
 
 // *********************************************************************
@@ -151,6 +152,8 @@ unsigned long currentMillis = millis();
 
       requestMemory(requestTime, DHT11_temp, humid, press, lightIntensity_string);
       requestTime++;
+      storeTemp(DHT11_temp);
+
     }
 
   if (LCDML_BUTTON_checkUp() || LCDML_BUTTON_checkDown()) {

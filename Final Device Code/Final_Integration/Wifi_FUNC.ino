@@ -1,4 +1,5 @@
 void printIPAddress();
+float returnTemp();
 
 void handleRoot() {
   server.send(200, "text/html", "<form action='/submit' method='post'><input type='text' name='ssid' placeholder='Enter SSID'><br><input type='text' name='password' placeholder='Enter Password'><br><input type='submit' value='Submit'></form>");
@@ -7,7 +8,8 @@ void handleRoot() {
 // ***********************************************************************************************************
 
 void handleTemp() {
-  float temperature = dht.readTemperature();  // Read temperature from DHT sensor
+  float temperature = returnTemp();
+
 
   if (!isnan(temperature)) {  // Check if the temperature reading is valid
     String response = "<html><head><meta charset='UTF-8'><style>body { font-size: 24px; }</style></head><body>";
