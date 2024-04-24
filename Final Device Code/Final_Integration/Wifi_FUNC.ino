@@ -4,6 +4,11 @@ float returnPress();
 float returnHumid();
 String returnLight();
 
+// Moving modes to seperate tabs
+void setupRequestMode();
+void requestMode();
+
+
 void handleRoot() {
   server.send(200, "text/html", "<form action='/submit' method='post'><input type='text' name='ssid' placeholder='Enter SSID'><br><input type='text' name='password' placeholder='Enter Password'><br><input type='submit' value='Submit'></form>");
 }
@@ -61,7 +66,30 @@ void handleLight() {
 }
 
 // ***********************************************************************************************************
+// http://<ESP32_IP_ADDRESS>/setMode?mode=<MODE_NAME>
+void handleSetMode() {
+  if (server.hasArg("mode")) {
+    String mode = server.arg("mode");
+    
+    // Execute code based on the mode
+    if (mode == "Request") {
+      Serial.println("REQUEST MODE VIA WIFI");
+      LCDML_DISP_jumpToFunc(LCDML_FUNC_request_mode);
+      //  Code for mode 1
 
+    } else if (mode == "Constant") {
+      Serial.println("CONSTANT MODE VIA WIFI");
+      LCDML_DISP_jumpToFunc(LCDML_FUNC_constant_mode);
+      // Code for mode 2
+    }
+    
+    server.send(200, "text/plain", "Mode set to " + mode);
+  } else {
+    server.send(400, "text/plain", "Missing mode parameter");
+  }
+}
+
+// ***********************************************************************************************************
 void handleRMM() {
   if (server.method() != HTTP_POST) {
     server.send(405, "text/plain", "Method Not Allowed");

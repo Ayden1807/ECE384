@@ -45,6 +45,7 @@ void wifiSetup() {
   server.on("/press", handlePress);
   server.on("/humid", handleHumid);
   server.on("/light", handleLight);
+  server.on("/setMode", HTTP_GET, handleSetMode);
 
   // server.on("/requestModeMemory", HTTP_POST, handleRMM);
   // server.on("/constantModeMemory", handleCMM);

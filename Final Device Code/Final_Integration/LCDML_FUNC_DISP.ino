@@ -53,6 +53,12 @@ void printConstantMemory();
 void storeData(float temp, float press, float humid, String lightIntensity_string);
 
 
+DHT11 dht11(DHTPIN);
+Adafruit_BMP280 bmp;
+unsigned long lastButtonTime = 0;
+unsigned long debounceDelay = 100;
+int requestTime = 0;
+
 // *********************************************************************
 // INFORMATION MODE
 // *********************************************************************
@@ -84,14 +90,10 @@ void LCDML_DISP_loop_end(LCDML_FUNC_information)
 
 // *********************************************************************
 // REQUEST MODE
-DHT11 dht11(DHTPIN);
-Adafruit_BMP280 bmp;
-unsigned long lastButtonTime = 0;
-unsigned long debounceDelay = 100;
-int requestTime = 0;
 // *********************************************************************
 void LCDML_DISP_setup(LCDML_FUNC_request_mode){
   // setup function   
+
   bmp.begin(BMP280_ADDRESS_ALT,  BMP280_CHIPID);
   lcd.setCursor(0, 0);
   lcd.print(F("REQUEST MODE"));
@@ -107,6 +109,7 @@ void LCDML_DISP_setup(LCDML_FUNC_request_mode){
 }
 
 void LCDML_DISP_loop(LCDML_FUNC_request_mode){ 
+
   float DHT11_temp = dht11.readTemperature();
   float humid = dht11.readHumidity();
   float press = bmp.readPressure() / 100.0;   //convert Pa to hPa for space saving
@@ -178,8 +181,12 @@ float humidSum = 0.0;
 float pressSum = 0.0;
 int lightSum = 0;
 int sampleCount = 0;
+
+unsigned long lastSampleTime = 0;
+const long sampleInterval = 60000;
 // *********************************************************************
 void LCDML_DISP_setup(LCDML_FUNC_constant_mode){
+
   // setup function   
   bmp.begin(BMP280_ADDRESS_ALT,  BMP280_CHIPID);
   lcd.setCursor(0, 0);
@@ -202,75 +209,79 @@ void LCDML_DISP_setup(LCDML_FUNC_constant_mode){
 }
 
 void LCDML_DISP_loop(LCDML_FUNC_constant_mode){ 
-  float DHT11_temp = dht11.readTemperature();
-  float humid = dht11.readHumidity();
-  float press = bmp.readPressure() / 100.0;   //convert Pa to hPa for space saving
-  int lightIntensity = analogRead(LIGHTPIN);
-  String lightIntensity_string = "V.Dark";
+  unsigned long currentTime = millis();
 
-  lcd.clear();
-  lcd.setBacklight(255);
-  Serial.println("SENSORS SAMPLED");
-  lcd.setCursor(0, 0);
-  lcd.print(DHT11_temp);
-  lcd.write(223);
-  lcd.print("C  ");
-  lcd.print(humid);
-  lcd.print("%");
-  lcd.setCursor(0, 1);
-  lcd.print(press);
-  lcd.print("hPa  ");
-  if(lightIntensity > 2800){
-    lcd.print("V.Dark");
-  } else if(lightIntensity > 1000){
-    lcd.print("Dark");
-    lightIntensity_string.replace("V.Dark", "Dark");
-  } else if(lightIntensity > 400){
-    lcd.print("Bright");
-    lightIntensity_string.replace("V.Dark","Bright");
-  } else{
-    lcd.print("V.Bright");
-    lightIntensity_string.replace("V.Dark", "V.Bright");
-  }
+  if (currentTime - lastSampleTime >= sampleInterval){
+    lastSampleTime = currentTime;
+  
+    float DHT11_temp = dht11.readTemperature();
+    float humid = dht11.readHumidity();
+    float press = bmp.readPressure() / 100.0;   //convert Pa to hPa for space saving
+    int lightIntensity = analogRead(LIGHTPIN);
+    String lightIntensity_string = "V.Dark";
 
-  // Summing for avg
-  tempSum += DHT11_temp;
-  pressSum += press;
-  humidSum += humid;
-  lightSum += lightIntensity;
-  sampleCount++;
-
-  // Calc avg and save it to memory
-  if(sampleCount == 10){
-    float avgTemp = tempSum / 10;
-    float avgPress = pressSum / 10;
-    float avgHumid = humidSum / 10;
-    int avgLight = lightSum / 10;
-
-    tempSum = 0.0;
-    pressSum = 0.0;
-    humidSum = 0.0;
-    lightSum = 0;
-    sampleCount = 0;
-    lightIntensity_string = "V.Dark";
-
-    if(avgLight > 2800){
-      lightIntensity_string = "V.Dark";
+    lcd.clear();
+    lcd.setBacklight(255);
+    Serial.println("SENSORS SAMPLED");
+    lcd.setCursor(0, 0);
+    lcd.print(DHT11_temp);
+    lcd.write(223);
+    lcd.print("C  ");
+    lcd.print(humid);
+    lcd.print("%");
+    lcd.setCursor(0, 1);
+    lcd.print(press);
+    lcd.print("hPa  ");
+    if(lightIntensity > 2800){
+      lcd.print("V.Dark");
     } else if(lightIntensity > 1000){
+      lcd.print("Dark");
       lightIntensity_string.replace("V.Dark", "Dark");
     } else if(lightIntensity > 400){
+      lcd.print("Bright");
       lightIntensity_string.replace("V.Dark","Bright");
     } else{
+      lcd.print("V.Bright");
       lightIntensity_string.replace("V.Dark", "V.Bright");
     }
 
-    constantMemory(constantTime, avgTemp, avgHumid, avgPress, lightIntensity_string);
-    constantTime++;
+    // Summing for avg
+    tempSum += DHT11_temp;
+    pressSum += press;
+    humidSum += humid;
+    lightSum += lightIntensity;
+    sampleCount++;
 
-    storeData(DHT11_temp, press, humid, lightIntensity_string);
+    // Calc avg and save it to memory
+    if(sampleCount == 10){
+      float avgTemp = tempSum / 10;
+      float avgPress = pressSum / 10;
+      float avgHumid = humidSum / 10;
+      int avgLight = lightSum / 10;
+
+      tempSum = 0.0;
+      pressSum = 0.0;
+      humidSum = 0.0;
+      lightSum = 0;
+      sampleCount = 0;
+      lightIntensity_string = "V.Dark";
+
+      if(avgLight > 2800){
+        lightIntensity_string = "V.Dark";
+      } else if(lightIntensity > 1000){
+        lightIntensity_string.replace("V.Dark", "Dark");
+      } else if(lightIntensity > 400){
+        lightIntensity_string.replace("V.Dark","Bright");
+      } else{
+        lightIntensity_string.replace("V.Dark", "V.Bright");
+      }
+
+      constantMemory(constantTime, avgTemp, avgHumid, avgPress, lightIntensity_string);
+      constantTime++;
+
+      storeData(DHT11_temp, press, humid, lightIntensity_string);
+    }
   }
-
-  delay(60000);
 
   if (LCDML_BUTTON_checkUp() || LCDML_BUTTON_checkDown()) {
     LCDML_BUTTON_resetLeft();
