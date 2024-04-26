@@ -4,10 +4,10 @@ float storedPress = 0.0;
 float storedHumid = 0.0;
 String storedLight = "";
 
-void storeData(float temp, float press, float humid, String lightIntensity_string){
-  storedTemp = temp;
+void storeData(float DHT11_temp, float press, float humid, String lightIntensity_string){
+  storedTemp = DHT11_temp;
   storedPress = press;
-  storedHumid = humid;
+  storedHumid = humid;`
   storedLight = lightIntensity_string;
 }
 

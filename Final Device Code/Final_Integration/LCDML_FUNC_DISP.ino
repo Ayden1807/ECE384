@@ -50,7 +50,7 @@ void printRequestMemory();
 void setupConstantMemory();
 void constantMemory(int currentTime, float DHT11_temp, float humid, float press, String lightIntensity_string);
 void printConstantMemory();
-void storeData(float temp, float press, float humid, String lightIntensity_string);
+void storeData(float DHT11_temp, float press, float humid, String lightIntensity_string);
 
 
 DHT11 dht11(DHTPIN);
@@ -58,6 +58,7 @@ Adafruit_BMP280 bmp;
 unsigned long lastButtonTime = 0;
 unsigned long debounceDelay = 100;
 int requestTime = 0;
+int debugVariable = 0;
 
 // *********************************************************************
 // INFORMATION MODE
@@ -123,6 +124,18 @@ unsigned long currentMillis = millis();
   if(currentMillis - lastButtonTime >= debounceDelay){
     if(LCDML_BUTTON_checkEnter()){
       LCDML_BUTTON_resetEnter();
+
+      if(debugVariable == 1){
+        Serial.print("DHT11 Temp: ");
+        Serial.print(DHT11_temp);
+        Serial.print("C\t DHT11 Humid: ");
+        Serial.print(humid);
+        Serial.print("%\t BMP280 Pressure: ");
+        Serial.print(press);
+        Serial.print("C\t Light Intensity: ");
+        Serial.println(lightIntensity_string);
+      }
+
       lcd.clear();
       lcd.setBacklight(255);
       Serial.println("BUTTON PRESSSED");
@@ -220,6 +233,17 @@ void LCDML_DISP_loop(LCDML_FUNC_constant_mode){
     int lightIntensity = analogRead(LIGHTPIN);
     String lightIntensity_string = "V.Dark";
 
+    if(debugVariable == 1){
+      Serial.print("DHT11 Temp: ");
+      Serial.print(DHT11_temp);
+      Serial.print("C\t DHT11 Humid: ");
+      Serial.print(humid);
+      Serial.print("%\t BMP280 Pressure: ");
+      Serial.print(press);
+      Serial.print("C\t Light Intensity: ");
+      Serial.println(lightIntensity_string);
+    }
+
     lcd.clear();
     lcd.setBacklight(255);
     Serial.println("SENSORS SAMPLED");
@@ -300,12 +324,25 @@ void LCDML_DISP_loop_end(LCDML_FUNC_constant_mode) {
 //===================================================================== *
 void LCDML_DISP_setup(LCDML_FUNC_debug_mode) {
   // setup
-  bmp.begin(BMP280_ADDRESS_ALT,  BMP280_CHIPID);
-  lcd.setCursor(0, 0);
-  lcd.print(F("DEBUG MODE"));
-  lcd.setCursor(0, 1);
-  lcd.print(F("ACTIVATED"));
-  delay(5000);
+  lcd.clear();
+  lcd.setBacklight(255);
+
+  if (debugVariable == 0){
+    debugVariable = 1;       //debug mode enabled
+    lcd.setCursor(0, 0);
+    lcd.print(F("DEBUG MODE"));
+    lcd.setCursor(0, 1);
+    lcd.print(F("ACTIVATED"));
+    delay(5000);
+  }else{
+    debugVariable = 0;
+    lcd.setCursor(0, 0);
+    lcd.print(F("DEBUG MODE"));
+    lcd.setCursor(0, 1);
+    lcd.print(F("DISABLED"));
+    delay(5000);
+  }
+  
   lcd.setBacklight(0);
 
 
@@ -314,71 +351,11 @@ void LCDML_DISP_setup(LCDML_FUNC_debug_mode) {
 }
 
 void LCDML_DISP_loop(LCDML_FUNC_debug_mode) {
-  float DHT11_temp = dht11.readTemperature();
-  float humid = dht11.readHumidity();
-  float press = bmp.readPressure() / 100.0;   //convert Pa to hPa for space saving
-  float BMP280_temp = bmp.readTemperature();
-  int lightIntensity = analogRead(LIGHTPIN);
-
-  Serial.print("DHT11 Temp: ");
-  Serial.print(DHT11_temp);
-  Serial.print("C\t DHT11 Humid: ");
-  Serial.print(humid);
-  Serial.print("%\t BMP280 Pressure: ");
-  Serial.print(press);
-  Serial.print("Pa\t BMP280 Temp: ");
-  Serial.print(BMP280_temp);
-  Serial.print("C\t Light Intensity: ");
-  Serial.println(lightIntensity);
-  
-  // loop
-  // is called when it is triggert
-  // - with LCDML_DISP_triggerMenu( millisecounds )
-  // - with every button status change
-
-  unsigned long currentMillis = millis();
-
-  if(currentMillis - lastButtonTime >= debounceDelay){
-    if(LCDML_BUTTON_checkEnter()){
-      LCDML_BUTTON_resetEnter();
-      lcd.clear();
-      lcd.setBacklight(255);
-      Serial.println("BUTTON PRESSSED");
-      lcd.setCursor(0, 0);
-      lcd.print(DHT11_temp);
-      lcd.write(223);
-      lcd.print("C  ");
-      lcd.print(humid);
-      lcd.print("%");
-      lcd.setCursor(0, 1);
-      lcd.print(press);
-      lcd.print("hPa  ");
-      if(lightIntensity > 2800){
-        lcd.print("V.Dark");
-      } else if(lightIntensity > 1000){
-        lcd.print("Dark");
-      } else if(lightIntensity > 400){
-        lcd.print("Bright");
-      } else{
-        lcd.print("V.Bright");
-      }
-
-      delay(5000);
-      lcd.setBacklight(0);
-      lcd.clear();
-      lastButtonTime = currentMillis;
-    }
-  }
-  // check if any button is presed (up or down)
-  if (LCDML_BUTTON_checkUp() || LCDML_BUTTON_checkDown()) {
-    LCDML_BUTTON_resetLeft();
-    LCDML_BUTTON_resetRight();
-    LCDML_DISP_funcend();
-  }
 }
 
 void LCDML_DISP_loop_end(LCDML_FUNC_debug_mode) {
   lcd.setBacklight(255);
+  lcd.clear();
   // this functions is ever called when a DISP function is quit
   // you can here reset some global vars or do nothing
 }

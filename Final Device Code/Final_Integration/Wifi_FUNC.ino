@@ -81,8 +81,23 @@ void handleSetMode() {
       Serial.println("CONSTANT MODE VIA WIFI");
       LCDML_DISP_jumpToFunc(LCDML_FUNC_constant_mode);
       // Code for mode 2
+    } else if (mode == "wifiClear") {
+      Serial.println("CLEAR WIFI MEMORY VIA WIFI");
+      LCDML_DISP_jumpToFunc(LCDML_FUNC_wifi_clear_memory);
+      // Code for mode 3
+    } else if (mode == "factoryReset") {
+      Serial.println("FACTORY RESET VIA WIFI");
+      LCDML_DISP_jumpToFunc(LCDML_FUNC_factory_reset);
+      // Code for mode 4
+    } else if (mode == "Debug") {
+      Serial.println("DEBUG TOGGLED VIA WIFI");
+      LCDML_DISP_jumpToFunc(LCDML_FUNC_debug_mode);
+      //Code for mode 5 
+    // } else if (mode == "Debug") {
+    // Serial.println("DEBUG TOGGLED VIA WIFI");
+    // LCDML_DISP_jumpToFunc(LCDML_FUNC_debug_mode);
     }
-    
+
     server.send(200, "text/plain", "Mode set to " + mode);
   } else {
     server.send(400, "text/plain", "Missing mode parameter");
@@ -90,6 +105,8 @@ void handleSetMode() {
 }
 
 // ***********************************************************************************************************
+// This function is not currenly used!!!
+
 void handleRMM() {
   if (server.method() != HTTP_POST) {
     server.send(405, "text/plain", "Method Not Allowed");
@@ -380,3 +397,7 @@ void clearWifiMemory(const char* path) {
 
   Serial.println("Wifi memory cleared");
 }
+
+// ***********************************************************************************************************
+
+void checkWifi
