@@ -1,10 +1,10 @@
 void setupRequestMemory(){
   Serial.print("Initializing SD card...");
   if (!SD.begin()) {
-    Serial.println("Card Mount Failed");
+    Serial.print("Card Mount Failed\t");
     return;
   }
-  Serial.print("OK");
+  Serial.print("OK\t");
 
   uint8_t cardType = SD.cardType();
 
@@ -15,21 +15,22 @@ void setupRequestMemory(){
 
   Serial.print("SD Card Type: ");
   if (cardType == CARD_MMC) {
-    Serial.println("MMC");
+    Serial.print("MMC\t");
   } else if (cardType == CARD_SD) {
-    Serial.println("SDSC");
+    Serial.print("SDSC\t");
   } else if (cardType == CARD_SDHC) {
-    Serial.println("SDHC");
+    Serial.print("SDHC\t");
   } else {
-    Serial.println("UNKNOWN");
+    Serial.print("UNKNOWN\t");
   }
 
   uint64_t cardSize = SD.cardSize() / (1024 * 1024);
   Serial.printf("SD Card Size: %lluMB\n", cardSize);
+  Serial.println();
 
   // Create CSV file and write header
   if (SD.remove("/requestMemory.csv")) {
-      Serial.println("OK");
+      Serial.println("Deleted requestMemory.csv for new session");
     } else {
       Serial.println("Error deleting requestMemory.csv");
     }
@@ -82,35 +83,36 @@ void printRequestMemory(){
 void setupConstantMemory(){
   Serial.print("Initializing SD card...");
   if (!SD.begin()) {
-    Serial.println("Card Mount Failed");
+    Serial.print("Card Mount Failed\t");
     return;
   }
-  Serial.print("OK");
+  Serial.print("OK\t");
 
   uint8_t cardType = SD.cardType();
 
   if (cardType == CARD_NONE) {
-    Serial.println("No SD card attached");
+    Serial.print("No SD card attached\t");
     return;
   }
 
   Serial.print("SD Card Type: ");
   if (cardType == CARD_MMC) {
-    Serial.println("MMC");
+    Serial.print("MMC\t");
   } else if (cardType == CARD_SD) {
-    Serial.println("SDSC");
+    Serial.print("SDSC\t");
   } else if (cardType == CARD_SDHC) {
-    Serial.println("SDHC");
+    Serial.print("SDHC\t");
   } else {
-    Serial.println("UNKNOWN");
+    Serial.print("UNKNOWN\t");
   }
 
   uint64_t cardSize = SD.cardSize() / (1024 * 1024);
   Serial.printf("SD Card Size: %lluMB\n", cardSize);
+  Serial.println();
 
   // Create CSV file and write header
   if (SD.remove("/constantMemory.csv")) {
-      Serial.println("OK");
+      Serial.println("Deleted constantMemory.csv for new session");
     } else {
       Serial.println("Error deleting constantMemory.csv");
     }

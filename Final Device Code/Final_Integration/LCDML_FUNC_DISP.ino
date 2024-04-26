@@ -138,7 +138,7 @@ unsigned long currentMillis = millis();
 
       lcd.clear();
       lcd.setBacklight(255);
-      Serial.println("BUTTON PRESSSED");
+      // Serial.println("BUTTON PRESSSED");
       lcd.setCursor(0, 0);
       lcd.print(DHT11_temp);
       lcd.write(223);
@@ -333,6 +333,7 @@ void LCDML_DISP_setup(LCDML_FUNC_debug_mode) {
     lcd.print(F("DEBUG MODE"));
     lcd.setCursor(0, 1);
     lcd.print(F("ACTIVATED"));
+    Serial.print("DEBUG MODE ACTIVATED");
     delay(5000);
   }else{
     debugVariable = 0;
@@ -340,14 +341,12 @@ void LCDML_DISP_setup(LCDML_FUNC_debug_mode) {
     lcd.print(F("DEBUG MODE"));
     lcd.setCursor(0, 1);
     lcd.print(F("DISABLED"));
+    Serial.print("DEBUG MODE DISABLED");
     delay(5000);
   }
   
-  lcd.setBacklight(0);
-
-
-  // starts a trigger event for the loop function every 1 secounds
-  LCDML_DISP_triggerMenu(1000);
+  // ends function
+  LCDML_DISP_funcend();
 }
 
 void LCDML_DISP_loop(LCDML_FUNC_debug_mode) {

@@ -400,4 +400,4 @@ void clearWifiMemory(const char* path) {
 
 // ***********************************************************************************************************
 
-void checkWifi
+// void checkWifi

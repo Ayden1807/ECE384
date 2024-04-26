@@ -7,7 +7,7 @@ String storedLight = "";
 void storeData(float DHT11_temp, float press, float humid, String lightIntensity_string){
   storedTemp = DHT11_temp;
   storedPress = press;
-  storedHumid = humid;`
+  storedHumid = humid;
   storedLight = lightIntensity_string;
 }
 
