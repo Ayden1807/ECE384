@@ -92,7 +92,7 @@
   LCDML_DISP_add      (8  , _LCDML_G1  , LCDML_root_5      , 4  , "Delete Saved"       , LCDML_FUNC_wifi_clear_memory);
   LCDML_DISP_add      (9  , _LCDML_G1  , LCDML_root_5      , 5  , "Disconnect"         , LCDML_FUNC_disconnect);
   LCDML_DISP_add      (10 , _LCDML_G1  , LCDML_root        , 6  , "WS Settings"        , LCDML_FUNC);
-  LCDML_DISP_add      (11 , _LCDML_G1  , LCDML_root_6      , 1  , "Clear History"      , LCDML_FUNC_clear_history);
+  LCDML_DISP_add      (11 , _LCDML_G1  , LCDML_root_6      , 1  , "CLR LocalHist"      , LCDML_FUNC_clear_history);
   LCDML_DISP_add      (12 , _LCDML_G1  , LCDML_root_6      , 2  , "Reboot"             , LCDML_FUNC_reboot);
   LCDML_DISP_add      (13 , _LCDML_G1  , LCDML_root_6      , 3  , "Factory Reset"      , LCDML_FUNC_factory_reset);
 
