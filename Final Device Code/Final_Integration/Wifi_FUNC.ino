@@ -92,12 +92,13 @@ void handleSetMode() {
     } else if (mode == "Debug") {
       Serial.println("DEBUG TOGGLED VIA WIFI");
       LCDML_DISP_jumpToFunc(LCDML_FUNC_debug_mode);
-      //Code for mode 5 
-    // } else if (mode == "Debug") {
-    // Serial.println("DEBUG TOGGLED VIA WIFI");
-    // LCDML_DISP_jumpToFunc(LCDML_FUNC_debug_mode);
-    }
+      // Code for mode 5 
+    } else if (mode == "historyClear") {
+    Serial.println("HISTORY CLEARED VIA WIFI");
+    LCDML_DISP_jumpToFunc(LCDML_FUNC_clear_history);
+    
 
+    } //Add more modes above this bracket
     server.send(200, "text/plain", "Mode set to " + mode);
   } else {
     server.send(400, "text/plain", "Missing mode parameter");

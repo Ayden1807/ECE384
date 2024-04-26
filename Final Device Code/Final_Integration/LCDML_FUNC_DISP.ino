@@ -48,6 +48,7 @@ void setupRequestMemory();
 void requestMemory(int currentTime, float DHT11_temp, float humid, float press, String lightIntensity_string);
 void printRequestMemory();
 void setupConstantMemory();
+void clearHistoricalMemory();
 void constantMemory(int currentTime, float DHT11_temp, float humid, float press, String lightIntensity_string);
 void printConstantMemory();
 void storeData(float DHT11_temp, float press, float humid, String lightIntensity_string);
@@ -621,6 +622,39 @@ void LCDML_DISP_loop_end(LCDML_FUNC_factory_reset)
 {
   // this functions is ever called when a DISP function is quit
   // you can here reset some global vars or do nothing
+}
+
+// *********************************************************************
+// CLEAR HISTORICAL DATA
+void LCDML_DISP_setup(LCDML_FUNC_clear_history)
+// *********************************************************************
+{ 
+  Serial.println("Clear Historical Data...");
+  lcd.setCursor(0, 0);
+  lcd.clear();
+  lcd.setBacklight(255);
+  lcd.print("Attempting to");
+  lcd.setCursor(0, 1);
+  lcd.print("Clear History");
+  delay(3000);
+
+  clearHistoricalMemory();
+
+  lcd.setCursor(0, 0);
+  lcd.clear();
+  lcd.setBacklight(255);
+  lcd.print("Clear History");
+  lcd.setCursor(0, 1);
+  lcd.print("Complete");
+  delay(3000);
+  LCDML_DISP_funcend();
+}
+
+void LCDML_DISP_loop(LCDML_FUNC_clear_history){}
+
+void LCDML_DISP_loop_end(LCDML_FUNC_clear_history) {
+  lcd.clear();
+  lcd.setBacklight(255);
 }
 
 // // *********************************************************************

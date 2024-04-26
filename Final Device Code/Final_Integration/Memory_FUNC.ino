@@ -124,7 +124,6 @@ void setupConstantMemory(){
     Serial.println("Header written to file");
   } else {
     Serial.println("Error creating constantMemory.csv");
-    
   }
 }
 
@@ -159,4 +158,56 @@ void printConstantMemory(){
   } else {
     Serial.println("Error opening constantMemory.csv for reading");
   }
+}
+
+void clearHistoricalMemory(){
+  lcd.clear();
+  if (SD.remove("/constantMemory.csv")) {
+      Serial.println("Deleted constantMemory.csv");
+      lcd.setCursor(0,0);
+      lcd.print("Local Constant");
+      lcd.setCursor(0,1);
+      lcd.print("Mem Cleared");
+    } else {
+      Serial.println("Error deleting constantMemory.csv");
+      lcd.setCursor(0,0);
+      lcd.print("ErrorClearing");
+      lcd.setCursor(0,1);
+      lcd.print("Constant Mem");
+    }
+  delay(3000);
+  File dataFile = SD.open("/constantMemory.csv", FILE_WRITE);
+  if (dataFile) {
+    dataFile.println("Time (s),DHT Temperature (C),BMP Pressure (Pa),Light Intensity");
+    dataFile.close();
+    Serial.println("Header written to file");
+  } else {
+    Serial.println("Error creating constantMemory.csv");
+  }
+
+  lcd.clear();
+  if (SD.remove("/requestMemory.csv")) {
+      Serial.println("Deleted requestMemory.csv");
+      lcd.setCursor(0,0);
+      lcd.print("Local Request");
+      lcd.setCursor(0,1);
+      lcd.print("Mem Cleared");
+    } else {
+      Serial.println("Error deleting requestMemory.csv");
+      lcd.setCursor(0,0);
+      lcd.print("ErrorClearing");
+      lcd.setCursor(0,1);
+      lcd.print("Constant Mem");
+    }
+  delay(3000);
+  dataFile = SD.open("/requestMemory.csv", FILE_WRITE);
+  if (dataFile) {
+    dataFile.println("Time (s),DHT Temperature (C),BMP Pressure (Pa),Light Intensity");
+    dataFile.close();
+    Serial.println("Header written to file");
+  } else {
+    Serial.println("Error creating constantMemory.csv");
+  }
+
+
 }
