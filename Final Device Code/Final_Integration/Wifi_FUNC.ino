@@ -10,7 +10,56 @@ void requestMode();
 
 
 void handleRoot() {
-  server.send(200, "text/html", "<form action='/submit' method='post'><input type='text' name='ssid' placeholder='Enter SSID'><br><input type='text' name='password' placeholder='Enter Password'><br><input type='submit' value='Submit'></form>");
+  // server.send(200, "text/html", "<form action='/submit' method='post'><input type='text' name='ssid' placeholder='Enter SSID'><br><input type='text' name='password' placeholder='Enter Password'><br><input type='submit' value='Submit'></form>");
+server.send(200, "text/html", R"(
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WiFi Setup</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    form {
+      text-align: center;
+    }
+
+    input[type="text"], input[type="submit"] {
+      width: 80%;
+      padding: 10px;
+      margin: 5px;
+      font-size: 20px;
+    }
+
+    input[type="submit"] {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <form action="/submit" method="post">
+    <input type="text" name="ssid" placeholder="Enter SSID"><br>
+    <input type="text" name="password" placeholder="Enter Password"><br>
+    <input type="submit" value="Submit">
+  </form>
+</body>
+</html>
+)");
 }
 
 // ***********************************************************************************************************
@@ -94,9 +143,18 @@ void handleSetMode() {
       LCDML_DISP_jumpToFunc(LCDML_FUNC_debug_mode);
       // Code for mode 5 
     } else if (mode == "historyClear") {
-    Serial.println("HISTORY CLEARED VIA WIFI");
-    LCDML_DISP_jumpToFunc(LCDML_FUNC_clear_history);
-    
+      Serial.println("HISTORY CLEARED VIA WIFI");
+      LCDML_DISP_jumpToFunc(LCDML_FUNC_clear_history);
+      // Code for mode 6
+    } else if (mode == "modeAP") {
+      Serial.println("ACCESS POINT MODE VIA WIFI");
+      LCDML_DISP_jumpToFunc(LCDML_FUNC_ap_connect);
+      // Code for mode 7
+    } else if (mode == "modeWifi") {
+      Serial.println("WIFI MODE VIA WIFI");
+      LCDML_DISP_jumpToFunc(LCDML_FUNC_wifi_connect); 
+      // Code for mode 8
+
 
     } //Add more modes above this bracket
     server.send(200, "text/plain", "Mode set to " + mode);
