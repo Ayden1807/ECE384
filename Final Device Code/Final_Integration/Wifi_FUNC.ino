@@ -154,6 +154,10 @@ void handleSetMode() {
       Serial.println("WIFI MODE VIA WIFI");
       LCDML_DISP_jumpToFunc(LCDML_FUNC_wifi_connect); 
       // Code for mode 8
+    } else if (mode == "Break") {
+      Serial.println("BREAK VIA WIFI");
+      LCDML_DISP_jumpToFunc(LCDML_FUNC); 
+      // Code for mode 9
 
 
     } //Add more modes above this bracket
@@ -365,7 +369,7 @@ void loadCredentials() {
     lcd.setCursor(0,0);
     lcd.print("Wifi Connected");
     lcd.setCursor(0,1);
-    lcd.print("IP: ");
+    lcd.print("IP:");
     lcd.print(WiFi.localIP());
     delay(5000);
     WiFi.mode(WIFI_STA);

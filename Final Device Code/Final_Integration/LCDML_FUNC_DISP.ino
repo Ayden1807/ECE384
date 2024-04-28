@@ -208,7 +208,6 @@ void LCDML_DISP_setup(LCDML_FUNC_constant_mode){
   lcd.setCursor(0, 1);
   lcd.print(F("ACTIVATED"));
   delay(5000);
-  lcd.setBacklight(0);
 
   setupConstantMemory();
   // starts a trigger event for the loop function every 1 secounds
@@ -334,7 +333,7 @@ void LCDML_DISP_setup(LCDML_FUNC_debug_mode) {
     lcd.print(F("DEBUG MODE"));
     lcd.setCursor(0, 1);
     lcd.print(F("ACTIVATED"));
-    Serial.print("DEBUG MODE ACTIVATED");
+    Serial.println("DEBUG MODE ACTIVATED");
     delay(5000);
   }else{
     debugVariable = 0;
@@ -342,7 +341,7 @@ void LCDML_DISP_setup(LCDML_FUNC_debug_mode) {
     lcd.print(F("DEBUG MODE"));
     lcd.setCursor(0, 1);
     lcd.print(F("DISABLED"));
-    Serial.print("DEBUG MODE DISABLED");
+    Serial.println("DEBUG MODE DISABLED");
     delay(5000);
   }
   
@@ -656,6 +655,7 @@ void LCDML_DISP_loop_end(LCDML_FUNC_clear_history) {
   lcd.clear();
   lcd.setBacklight(255);
 }
+
 
 // // *********************************************************************
 // unsigned long g_initscreen_example_counter = 0;
