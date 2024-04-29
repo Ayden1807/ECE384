@@ -7,59 +7,60 @@ String returnLight();
 // Moving modes to seperate tabs
 void setupRequestMode();
 void requestMode();
+void apSetup();
 
 
 void handleRoot() {
   // server.send(200, "text/html", "<form action='/submit' method='post'><input type='text' name='ssid' placeholder='Enter SSID'><br><input type='text' name='password' placeholder='Enter Password'><br><input type='submit' value='Submit'></form>");
-server.send(200, "text/html", R"(
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WiFi Setup</title>
-  <style>
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      font-family: Arial, sans-serif;
-    }
+  server.send(200, "text/html", R"(
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiFi Setup</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        font-family: Arial, sans-serif;
+      }
 
-    form {
-      text-align: center;
-    }
+      form {
+        text-align: center;
+      }
 
-    input[type="text"], input[type="submit"] {
-      width: 80%;
-      padding: 10px;
-      margin: 5px;
-      font-size: 20px;
-    }
+      input[type="text"], input[type="submit"] {
+        width: 80%;
+        padding: 10px;
+        margin: 5px;
+        font-size: 20px;
+      }
 
-    input[type="submit"] {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
+      input[type="submit"] {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
 
-    input[type="submit"]:hover {
-      background-color: #45a049;
-    }
-  </style>
-</head>
-<body>
-  <form action="/submit" method="post">
-    <input type="text" name="ssid" placeholder="Enter SSID"><br>
-    <input type="text" name="password" placeholder="Enter Password"><br>
-    <input type="submit" value="Submit">
-  </form>
-</body>
-</html>
-)");
+      input[type="submit"]:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <form action="/submit" method="post">
+      <input type="text" name="ssid" placeholder="Enter SSID"><br>
+      <input type="text" name="password" placeholder="Enter Password"><br>
+      <input type="submit" value="Submit">
+    </form>
+  </body>
+  </html>
+  )");
 }
 
 // ***********************************************************************************************************
@@ -246,26 +247,31 @@ void handleSubmit() {
   String password = server.arg("password");
 
   // Connect to the submitted WiFi network
+  int wifiTry = 0;
   WiFi.begin(ssid.c_str(), password.c_str());
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED && wifiTry < 20) {
     delay(500);
     Serial.print(".");
+    wifiTry++;
   }
 
-  // Stop Access Point mode
-  WiFi.mode(WIFI_STA);
-  WiFi.softAPdisconnect(true);
+  if(WiFi.status() == WL_CONNECTED){
+    WiFi.mode(WIFI_STA);
+    WiFi.softAPdisconnect(true);
 
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
+    Serial.println("");
+    Serial.println("WiFi connected");
+    Serial.print("IP address: ");
+    Serial.println(WiFi.localIP());
 
-  // Save the new SSID and password to SPIFFS
-  saveCredentials(ssid, password);
-
-  // Print the new IP address to the LCD
-  printIPAddress();
+    // Save the new SSID and password to SPIFFS
+    saveCredentials(ssid, password);
+    // Print the new IP address to the LCD
+    printIPAddress();
+  }else{
+    Serial.println("Wifi Connection Failed");
+    apSetup();
+  }
 }
 
 // ***********************************************************************************************************
@@ -353,7 +359,7 @@ void loadCredentials() {
   delay(1000);
   int attempt = 0;
   WiFi.begin(char_ssidMemory, char_passwordMemory);
-  while (WiFi.status() != WL_CONNECTED && attempt < 30) { // Try for a maximum of 10 attempts
+  while (WiFi.status() != WL_CONNECTED && attempt < 20) { // Try for a maximum of 10 attempts
     delay(500);
     Serial.print(".");
     attempt++;

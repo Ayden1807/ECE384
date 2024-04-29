@@ -85,8 +85,13 @@ void apSetup(){
   Serial.println(WiFi.softAPIP());
 
   server.on("/", handleRoot);
+  server.onNotFound(handleNotFound);     // Not found handler
   server.on("/submit", handleSubmit);
-  server.on("/temp", handleTemp);  // New route for temperature data
+  server.on("/temp", handleTemp);  
+  server.on("/press", handlePress);
+  server.on("/humid", handleHumid);
+  server.on("/light", handleLight);
+  server.on("/setMode", HTTP_GET, handleSetMode);
 
   server.begin();
   Serial.println("HTTP server started");
